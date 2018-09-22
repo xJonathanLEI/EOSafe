@@ -101,6 +101,35 @@ void wallet::setdeptlmt(uint64_t id, uint64_t new_allowance)
     });
 }
 
+void wallet::processapp(uint64_t id, bool approve)
+{
+    // Checks auth
+    auto configs = get_config();
+    require_auth2(configs.executor, PERMISSION_PROCESS_APPLICATION);
+
+    // Gets application
+    tbl_applications applications(_self, _self);
+    auto application = applications.find(id);
+    eosio_assert(application != applications.end(), "Application does not exist");
+    eosio_assert(application->status == APPLICATION_STATUS_PENDING, "Application has already been processed");
+
+    // Changes application status
+    applications.modify(application, _self, [&](::application &modified_application) {
+        modified_application.status = approve ? APPLICATION_STATUS_APPROVED : APPLICATION_STATUS_REJECTED;
+    });
+
+    // Nothing to do if rejected
+    if (!approve)
+        return;
+
+    // Changes the allowance
+    tbl_departments departments(_self, _self);
+    auto department = departments.find(application->department_id);
+    departments.modify(department, _self, [&](::department &modified_department) {
+        modified_department.monthly_allowance = application->to_allowance;
+    });
+}
+
 config wallet::get_config()
 {
     tbl_configs configs(_self, _self);
