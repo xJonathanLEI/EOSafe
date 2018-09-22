@@ -130,6 +130,36 @@ void wallet::processapp(uint64_t id, bool approve)
     });
 }
 
+void wallet::addexpense(uint64_t department_id, string name, account_name recipient, uint64_t monthly_allowance)
+{
+    // Gets the department
+    tbl_departments departments(_self, _self);
+    auto department = departments.find(department_id);
+    eosio_assert(department != departments.end(), "The department does not exist");
+
+    // Checks auth
+    auto configs = get_config();
+    require_auth2(configs.executor, department->permission);
+
+    // Recipient must exist
+    eosio_assert(is_account(recipient), "The recipient account does not exist");
+
+    // TODO: check to ensure allowance allocated is not exceeded
+
+    // Finds next expenditure id
+    tbl_expenditures expenditures(_self, department_id);
+    auto last_expenditure = expenditures.rbegin();
+    uint64_t next_expenditure_id = last_expenditure == expenditures.rend() ? 1 : last_expenditure->id + 1;
+
+    // Adds the expenditure
+    expenditures.emplace(_self, [&](expenditure &new_expenditure) {
+        new_expenditure.id = next_expenditure_id;
+        new_expenditure.name = name;
+        new_expenditure.recipient = recipient;
+        new_expenditure.monthly_allowance = monthly_allowance;
+    });
+}
+
 config wallet::get_config()
 {
     tbl_configs configs(_self, _self);
