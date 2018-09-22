@@ -1,6 +1,6 @@
 #include "wallet.hpp"
 
-void wallet::init(account_name executor, extended_symbol token)
+void wallet::init(account_name executor, extended_symbol token, uint64_t init_sys_limit)
 {
     // The contract's permission shall be changed to eosio.code
     // after calling init to remove any risk of being hacked.
@@ -21,8 +21,22 @@ void wallet::init(account_name executor, extended_symbol token)
     //  Writes the configs
     config new_config{
         .executor = executor,
-        .token = token};
+        .token = token,
+        .system_monthly_limit = init_sys_limit};
     configs.set(new_config, _self);
+}
+
+void wallet::setsyslmt(uint64_t new_allowance)
+{
+    // Checks auth
+    tbl_configs configs(_self, _self);
+    eosio_assert(configs.exists(), "The contract has not been initialized");
+    auto config = configs.get();
+    require_auth2(config.executor, PERMISSION_SET_SYSTEM_LIMIT);
+
+    // Changes the allowance
+    config.system_monthly_limit = new_allowance;
+    configs.set(config, _self);
 }
 
 void wallet::newdept(string name, permission_name permission)

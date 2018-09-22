@@ -20,6 +20,16 @@ class wallet : public contract
     const uint8_t APPLICATION_STATUS_APPROVED = 2;
     const uint8_t APPLICATION_STATUS_REJECTED = 3;
 
+    /*
+     * The only possible point of failure in the system would be setsyslmt.
+     * With control on setsyslmt, a hacker can first set a very high limit,
+     * and then create a new department with high allowance to spend all the
+     * tokens.
+     * 
+     * Thus, it's SUPER IMPORTANT for the owner permission to be controlled
+     * by multiple private keys via msig.
+     */
+    const permission_name PERMISSION_SET_SYSTEM_LIMIT = N(owner);
     const permission_name PERMISSION_ADD_DEPARTMENT = N(newdept);
     const permission_name PERMISSION_TOGGLE_DEPARTMENT = N(tgldept);
     const permission_name PERMISSION_PROCESS_APPLICATION = N(processapp);
@@ -55,7 +65,9 @@ class wallet : public contract
     /* Interfaces */
 
     /// @abi action init
-    void init(account_name executor, extended_symbol token);
+    void init(account_name executor, extended_symbol token, uint64_t init_sys_limit);
+    /// @abi action setsyslmt
+    void setsyslmt(uint64_t new_allowance);
     /// @abi action newdept
     void newdept(string name, permission_name permission);
     /// @abi action toggledept
