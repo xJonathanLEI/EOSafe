@@ -186,6 +186,10 @@ void wallet::rmexpense(uint64_t department_id, uint64_t expenditure_id)
     eosio_assert(!expenditure->removed, "Expenditure has already been removed");
 
     // Changes the expenditure removal flag
+    //
+    // Not using erase to free up RAM only for DEMO PURPOSE because
+    // removing it from the RAM makes it much harder for eosjs to fetch history
+    //
     expenditures.modify(expenditure, _self, [&](::expenditure &modified_expenditure) {
         modified_expenditure.removed = true;
     });
@@ -193,6 +197,56 @@ void wallet::rmexpense(uint64_t department_id, uint64_t expenditure_id)
     // Changes the allowance allocated (no need to check underflow)
     departments.modify(department, _self, [&](::department &modified_department) {
         modified_department.allowance_allocated -= expenditure->monthly_allowance;
+    });
+}
+
+void wallet::adjexpense(uint64_t department_id, uint64_t expenditure_id, uint64_t new_allowance)
+{
+    // Gets the department
+    tbl_departments departments(_self, _self);
+    auto department = departments.find(department_id);
+    eosio_assert(department != departments.end(), "The department does not exist");
+
+    // Checks auth
+    auto configs = get_config();
+    require_auth2(configs.executor, department->permission);
+
+    // Gets expenditure
+    tbl_expenditures expenditures(_self, department_id);
+    auto expenditure = expenditures.find(expenditure_id);
+    eosio_assert(expenditure != expenditures.end(), "Expenditure does not exist");
+
+    // The expenditure must have not been removed
+    eosio_assert(!expenditure->removed, "Expenditure has been removed");
+
+    // Must change the allowance
+    eosio_assert(expenditure->monthly_allowance != new_allowance, "Must change monthly allowance");
+
+    if (expenditure->monthly_allowance > new_allowance)
+    {
+        // Reducing allowance
+        uint64_t delta = expenditure->monthly_allowance - new_allowance;
+
+        departments.modify(department, _self, [&](::department &modified_department) {
+            modified_department.allowance_allocated -= delta;
+        });
+    }
+    else
+    {
+        // Increasing allowance
+        uint64_t delta = new_allowance - expenditure->monthly_allowance;
+
+        uint64_t new_department_allocated = department->allowance_allocated + delta;
+        eosio_assert(new_department_allocated > department->allowance_allocated, "Allocation overflow");
+        eosio_assert(new_department_allocated < department->monthly_allowance, "Allocation overdrawn");
+
+        departments.modify(department, _self, [&](::department &modified_department) {
+            modified_department.allowance_allocated += new_department_allocated;
+        });
+    }
+
+    expenditures.modify(expenditure, _self, [&](::expenditure &modified_expenditure) {
+        modified_expenditure.monthly_allowance = new_allowance;
     });
 }
 
