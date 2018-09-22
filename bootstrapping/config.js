@@ -24,5 +24,11 @@ module.exports = {
     mktPermissionName: "marketing",
 
     actionAddDepartment: "newdept",
-    permissionAddDepartment: "newdept"
+    permissionAddDepartment: "newdept",
+
+    actionToggleDepartment: "tgldept",
+    permissionToggleDepartment: "tgldept",
+
+    actionProcessApplication: "processapp",
+    permissionProcessApplication: "processapp"
 };
