@@ -9,10 +9,7 @@ class wallet : public contract
     using contract::contract;
 
     /// @abi action hi
-    void hi(account_name user)
-    {
-        print("Hello, ", name{user});
-    }
+    void hi(account_name user);
 };
 
 extern "C"
