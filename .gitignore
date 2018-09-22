@@ -7,3 +7,4 @@
 /frontend/deploy
 /frontend/.idea/
 /frontend/.vscode
+/frontend/.cache-loader
