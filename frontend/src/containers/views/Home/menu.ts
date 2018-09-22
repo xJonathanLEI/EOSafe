@@ -18,6 +18,7 @@ export const asynchronousComponents = {
     Users: loadComponent(() => import(/* webpackChunkName: "users" */ '@views/Users')),
     CfoPanel: loadComponent(() => import('@views/CfoPanel')),
     PlaceHolderPanel: loadComponent(() => import('@views/PlaceHolderPanel')),
+    ExpenseDetailPage: loadComponent(() => import('@views/ExpenseDetailPage')),
 }
 
 // 所有路由的key
@@ -96,6 +97,14 @@ export const menu: IMenu[] = [
         title: 'CFO Controls',
         icon: 'user',
         component: 'CfoPanel',
+        exact: true
+    },
+    {
+        id: 2000,
+        path: '/expense_detail',
+        title: 'Expense Detail Page',
+        icon: 'money-collect',
+        component: 'ExpenseDetailPage',
         exact: true
     },
     {

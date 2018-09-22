@@ -3,9 +3,17 @@ import { observer } from 'mobx-react'
 // import { observable, action } from 'mobx'
 
 import * as styles from './index.scss'
+import {ComponentExt} from "@utils/reactExt";
+import {FormComponentProps} from "antd/lib/form";
+import {IStoreProps} from "@shared/PrivateRoute";
+import {Form} from "antd";
+
+interface IProps extends IStoreProps {
+
+}
 
 @observer
-class PlaceHolderPanel extends React.Component {
+class PlaceHolderPanel extends ComponentExt<IProps & FormComponentProps> {
     // @observable
     // private tableScrollY: number = 0
 
@@ -45,4 +53,4 @@ class PlaceHolderPanel extends React.Component {
     }
 }
 
-export default PlaceHolderPanel
+export default Form.create<IProps>()(PlaceHolderPanel)
