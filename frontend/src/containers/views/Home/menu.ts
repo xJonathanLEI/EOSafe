@@ -15,7 +15,8 @@ export const asynchronousComponents = {
         import(/* webpackChunkName: "chart-line-smooth" */ '@views/Charts/LineSmooth')
     ),
     ChartPie: loadComponent(() => import(/* webpackChunkName: "chart-pie" */ '@views/Charts/Pie')),
-    Users: loadComponent(() => import(/* webpackChunkName: "users" */ '@views/Users'))
+    Users: loadComponent(() => import(/* webpackChunkName: "users" */ '@views/Users')),
+    CfoPanel: loadComponent(() => import('@views/CfoPanel'))
 }
 
 // 所有路由的key
@@ -87,7 +88,15 @@ export const menu: IMenu[] = [
         icon: 'user',
         component: 'Users',
         exact: true
-    }
+    },
+    {
+        id: 1000,
+        path: '/cfo',
+        title: 'CFO Controls',
+        icon: 'user',
+        component: 'CfoPanel',
+        exact: true
+    },
 ]
 
 export default menu
