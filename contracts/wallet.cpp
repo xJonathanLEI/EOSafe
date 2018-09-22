@@ -287,7 +287,7 @@ void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amo
     eosio_assert(department->enabled, "Department has been suspended");
 
     // Expenditure must not be removed
-    eosio_assert(expenditure->removed, "Expenditure has been removed");
+    eosio_assert(!expenditure->removed, "Expenditure has been removed");
 
     // Checks allowance
     uint64_t new_used_expenditure_allownance = add_spend(expenditure->allowance_used, amount, expenditure->last_spend_time);
