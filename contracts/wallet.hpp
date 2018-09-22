@@ -1,6 +1,7 @@
 #include <eosiolib/eosio.hpp>
 #include <eosiolib/asset.hpp>
 #include <eosiolib/singleton.hpp>
+#include <eosiolib/transaction.hpp>
 
 #include "tables/tables.hpp"
 
@@ -23,6 +24,14 @@ class wallet : public contract
 
     /* Structs */
 
+    struct transfer_args
+    {
+        account_name from;
+        account_name to;
+        asset quantity;
+        string memo;
+    };
+
     struct currency_stats
     {
         asset supply;
@@ -39,6 +48,7 @@ class wallet : public contract
     typedef multi_index<N(departments), department> tbl_departments;
     typedef multi_index<N(applications), application> tbl_applications;
     typedef multi_index<N(expenditures), expenditure> tbl_expenditures;
+    typedef multi_index<N(expenses), expense> tbl_expenses;
 
     /* Interfaces */
 
@@ -54,6 +64,8 @@ class wallet : public contract
     void processapp(uint64_t id, bool approve);
     /// @abi action addexpense
     void addexpense(uint64_t department_id, string name, account_name recipient, uint64_t monthly_allowance);
+    /// @abi action spend
+    void spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amount, string memo);
 
   private:
     config get_config();
@@ -69,7 +81,7 @@ extern "C"
         {
             switch (action)
             {
-                EOSIO_API(wallet, (init)(newdept)(toggledept)(setdeptlmt)(processapp)(addexpense))
+                EOSIO_API(wallet, (init)(newdept)(toggledept)(setdeptlmt)(processapp)(addexpense)(spend))
             }
         }
     }

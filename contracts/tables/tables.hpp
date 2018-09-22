@@ -4,3 +4,4 @@
 #include "department.hpp"
 #include "application.hpp"
 #include "expenditure.hpp"
+#include "expense.hpp"

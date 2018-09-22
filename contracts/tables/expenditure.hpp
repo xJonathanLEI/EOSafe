@@ -15,6 +15,9 @@ struct expenditure
     account_name recipient;
     uint64_t monthly_allowance;
 
+    uint32_t last_spend_time = 0;
+    uint64_t allowance_used = 0;
+
     auto primary_key() const
     {
         return id;

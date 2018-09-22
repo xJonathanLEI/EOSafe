@@ -168,6 +168,77 @@ void wallet::addexpense(uint64_t department_id, string name, account_name recipi
     });
 }
 
+void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amount, string memo)
+{
+    // Gets the department
+    tbl_departments departments(_self, _self);
+    auto department = departments.find(department_id);
+    eosio_assert(department != departments.end(), "The department does not exist");
+
+    // Checks auth
+    auto configs = get_config();
+    require_auth2(configs.executor, department->permission);
+
+    // Department must not be disabled
+    eosio_assert(department->enabled, "Department has been suspended");
+
+    // Gets expenditure
+    tbl_expenditures expenditures(_self, department_id);
+    auto expenditure = expenditures.find(expenditure_id);
+    eosio_assert(expenditure != expenditures.end(), "Expenditure does not exist");
+
+    // Checks allowance
+    // TODO: check new month and clear the amount
+    uint64_t new_used_expenditure_allownance = expenditure->allowance_used + amount;
+    uint64_t new_used_department_allowance = department->allowance_used + amount;
+    {
+        // Expenditure level
+        eosio_assert(new_used_expenditure_allownance > expenditure->allowance_used, "Allowance overflow");
+        eosio_assert(new_used_expenditure_allownance <= expenditure->monthly_allowance, "Allowance overdrawn");
+    }
+    {
+        // Department level
+        eosio_assert(new_used_department_allowance > department->allowance_used, "Allowance overflow");
+        eosio_assert(new_used_department_allowance <= department->monthly_allowance, "Allowance overdrawn");
+    }
+
+    // Sends the token
+    transfer_args token_transfer{
+        .from = _self,
+        .to = expenditure->recipient,
+        .quantity = asset(amount, symbol_type(configs.token.value)),
+        .memo = memo};
+    action(permission_level{_self, N(active)}, configs.token.contract, N(transfer), token_transfer)
+        .send();
+
+    // Changes expenditure allowance used
+    expenditures.modify(expenditure, _self, [&](::expenditure &modified_expenditure) {
+        modified_expenditure.allowance_used = new_used_expenditure_allownance;
+    });
+
+    // Changes department allowance used
+    departments.modify(department, _self, [&](::department &modified_department) {
+        modified_department.allowance_used = new_used_department_allowance;
+    });
+
+    // Adds to expense history
+    //
+    // Note that this is just for DEMO PURPOSE so that eosjs can
+    // easily pull out the entire history. For real production
+    // an off-chain record-keeping system shall be used to save RAM.
+    //
+    tbl_expenses expenses(_self, _self);
+    auto last_expense = expenses.rbegin();
+    expenses.emplace(_self, [&](expense &new_expense) {
+        new_expense.id = last_expense == expenses.rend() ? 1 : last_expense->id + 1;
+        new_expense.department_id = department_id;
+        new_expense.expenditure_id = expenditure_id;
+        new_expense.time = now();
+        new_expense.amount = amount;
+        new_expense.memo = memo;
+    });
+}
+
 config wallet::get_config()
 {
     tbl_configs configs(_self, _self);

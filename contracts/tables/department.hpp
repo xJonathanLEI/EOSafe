@@ -18,6 +18,9 @@ struct department
     uint64_t monthly_allowance = 0;
     uint64_t allowance_allocated = 0;
 
+    uint32_t last_spend_time = 0;
+    uint64_t allowance_used = 0;
+
     auto primary_key() const
     {
         return id;
