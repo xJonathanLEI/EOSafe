@@ -44,6 +44,26 @@ void wallet::newdept(string name, permission_name permission)
     });
 }
 
+void wallet::toggledept(uint64_t id, bool enabled)
+{
+    // Checks auth
+    auto configs = get_config();
+    require_auth2(configs.executor, PERMISSION_TOGGLE_DEPARTMENT);
+
+    // Gets the department
+    tbl_departments departments(_self, _self);
+    auto target_department = departments.find(id);
+    eosio_assert(target_department != departments.end(), "The department does not exist");
+
+    // The status must be changed
+    eosio_assert(target_department->enabled != enabled, "The department status is not being changed");
+
+    // Changes the status
+    departments.modify(target_department, _self, [&](department &modified_department) {
+        modified_department.enabled = enabled;
+    });
+}
+
 config wallet::get_config()
 {
     tbl_configs configs(_self, _self);

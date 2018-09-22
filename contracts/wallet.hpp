@@ -13,6 +13,7 @@ class wallet : public contract
 
     /* Constants */
     const permission_name PERMISSION_ADD_DEPARTMENT = N(newdept);
+    const permission_name PERMISSION_TOGGLE_DEPARTMENT = N(tgldept);
 
     /* Structs */
 
@@ -37,6 +38,8 @@ class wallet : public contract
     void init(account_name executor, extended_symbol token);
     /// @abi action newdept
     void newdept(string name, permission_name permission);
+    /// @abi action toggledept
+    void toggledept(uint64_t id, bool enabled);
 
   private:
     config get_config();
@@ -52,7 +55,7 @@ extern "C"
         {
             switch (action)
             {
-                EOSIO_API(wallet, (init))
+                EOSIO_API(wallet, (init)(newdept)(toggledept))
             }
         }
     }
