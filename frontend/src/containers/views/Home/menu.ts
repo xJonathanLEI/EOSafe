@@ -19,6 +19,7 @@ export const asynchronousComponents = {
     CfoPanel: loadComponent(() => import('@views/CfoPanel')),
     PlaceHolderPanel: loadComponent(() => import('@views/PlaceHolderPanel')),
     ExpenseDetailPage: loadComponent(() => import('@views/ExpenseDetailPage')),
+    DepartmentPanel: loadComponent(() => import('@views/DepartmentPanel')),
 }
 
 // 所有路由的key
@@ -86,7 +87,7 @@ export const menu: IMenu[] = [
     {
         id: 3,
         path: '/users',
-        title: 'Users',
+        title: 'DepartmentPanel',
         icon: 'user',
         component: 'Users',
         exact: true
@@ -105,6 +106,14 @@ export const menu: IMenu[] = [
         title: 'Expense Detail Page',
         icon: 'money-collect',
         component: 'ExpenseDetailPage',
+        exact: true
+    },
+    {
+        id: 3000,
+        path: '/department',
+        title: 'Department Panel',
+        icon: 'block',
+        component: 'DepartmentPanel',
         exact: true
     },
     {

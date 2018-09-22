@@ -1,5 +1,7 @@
 import './index.scss'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css'
 
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
@@ -28,5 +30,6 @@ const render = Component => {
         document.getElementById('app') as HTMLElement
     )
 }
+
 
 render(AppRouter)
