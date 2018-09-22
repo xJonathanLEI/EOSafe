@@ -1,3 +1,5 @@
+# Front-end files
+
 /frontend/node_modules
 /frontend/npm-debug*
 /frontend/dist
@@ -7,3 +9,10 @@
 /frontend/deploy
 /frontend/.idea/
 /frontend/.vscode
+
+# Contract files
+
+contracts/build/
+
+# Some VS Code Configs
+.vscode/settings.json
