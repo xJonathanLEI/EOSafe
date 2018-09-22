@@ -1,0 +1,18 @@
+@import '_base.scss';
+
+.content {
+    display: flex;
+    padding: 15px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    & > * {
+        display: flex;
+        width: 100%;
+        padding: 15px;
+        flex: 1;
+        background-color: white;
+        overflow-y: auto;
+    }
+}

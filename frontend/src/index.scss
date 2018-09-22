@@ -1,0 +1,29 @@
+@import '_base.scss';
+
+:global {
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+    }
+
+    #app {
+        width: 100%;
+        height: 100%;
+    }
+
+    svg,
+    svg path {
+        fill: currentcolor;
+    }
+
+    .center-table {
+        table td {
+            text-align: center;
+        }
+
+        .ant-table-thead > tr > th {
+            text-align: center;
+        }
+    }
+}

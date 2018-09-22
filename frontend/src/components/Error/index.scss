@@ -1,0 +1,16 @@
+@import '_base.scss';
+
+.centered {
+    text-align: center;
+}
+
+.emoji {
+    font-size: 9em;
+    user-select: none;
+}
+
+.title {
+    color: grey;
+    font-size: 3em;
+    text-align: center;
+}

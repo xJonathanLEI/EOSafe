@@ -1,0 +1,29 @@
+@import '_base.scss';
+
+.login {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.form {
+    width: 320px;
+    padding: 36px 36px 12px;
+    box-shadow: 0 0 100px rgba(0, 0, 0, 0.08);
+}
+
+.logoBox {
+    font-size: 55px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.tips {
+    display: flex;
+    color: $gray-color;
+    justify-content: space-around;
+    font-size: $font-size-sm;
+    margin-top: -20px;
+}
