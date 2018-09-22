@@ -66,6 +66,8 @@ class wallet : public contract
     void processapp(uint64_t id, bool approve);
     /// @abi action addexpense
     void addexpense(uint64_t department_id, string name, account_name recipient, uint64_t monthly_allowance);
+    /// @abi action rmexpense
+    void rmexpense(uint64_t department_id, uint64_t expenditure_id);
     /// @abi action spend
     void spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amount, string memo);
 
@@ -84,7 +86,7 @@ extern "C"
         {
             switch (action)
             {
-                EOSIO_API(wallet, (init)(newdept)(toggledept)(setdeptlmt)(processapp)(addexpense)(spend))
+                EOSIO_API(wallet, (init)(newdept)(toggledept)(setdeptlmt)(processapp)(addexpense)(rmexpense)(spend))
             }
         }
     }

@@ -168,6 +168,34 @@ void wallet::addexpense(uint64_t department_id, string name, account_name recipi
     });
 }
 
+void wallet::rmexpense(uint64_t department_id, uint64_t expenditure_id)
+{
+    // Gets the department
+    tbl_departments departments(_self, _self);
+    auto department = departments.find(department_id);
+    eosio_assert(department != departments.end(), "The department does not exist");
+
+    // Checks auth
+    auto configs = get_config();
+    require_auth2(configs.executor, department->permission);
+
+    // Gets the expenditure
+    tbl_expenditures expenditures(_self, department_id);
+    auto expenditure = expenditures.find(expenditure_id);
+    eosio_assert(expenditure != expenditures.end(), "Expenditure does not exist");
+    eosio_assert(!expenditure->removed, "Expenditure has already been removed");
+
+    // Changes the expenditure removal flag
+    expenditures.modify(expenditure, _self, [&](::expenditure &modified_expenditure) {
+        modified_expenditure.removed = true;
+    });
+
+    // Changes the allowance allocated (no need to check underflow)
+    departments.modify(department, _self, [&](::department &modified_department) {
+        modified_department.allowance_allocated -= expenditure->monthly_allowance;
+    });
+}
+
 void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amount, string memo)
 {
     // Gets the department
@@ -179,13 +207,16 @@ void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amo
     auto configs = get_config();
     require_auth2(configs.executor, department->permission);
 
-    // Department must not be disabled
-    eosio_assert(department->enabled, "Department has been suspended");
-
     // Gets expenditure
     tbl_expenditures expenditures(_self, department_id);
     auto expenditure = expenditures.find(expenditure_id);
     eosio_assert(expenditure != expenditures.end(), "Expenditure does not exist");
+
+    // Department must not be disabled
+    eosio_assert(department->enabled, "Department has been suspended");
+
+    // Expenditure must not be removed
+    eosio_assert(expenditure->removed, "Expenditure has been removed");
 
     // Checks allowance
     uint64_t new_used_expenditure_allownance = add_spend(expenditure->allowance_used, amount, expenditure->last_spend_time);

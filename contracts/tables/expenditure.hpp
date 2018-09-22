@@ -18,6 +18,8 @@ struct expenditure
     uint32_t last_spend_time = 0;
     uint64_t allowance_used = 0;
 
+    bool removed = false;
+
     auto primary_key() const
     {
         return id;
