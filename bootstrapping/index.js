@@ -9,7 +9,12 @@ const eos = Eos({
     chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
     keyProvider: [
         config.sysPrivKey,
-        config.walletKey
+        config.walletKey,
+        config.executorKey,
+        config.cfoKey,
+        config.executorOwner1,
+        config.executorOwner2,
+        config.executorOwner3
     ]
 });
 
@@ -59,6 +64,76 @@ async function run() {
     await eos.transaction(config.walletName, wallet => {
         wallet.init(config.executorName, "4,EOS@eosio.token", 100000000, { authorization: config.walletName + "@active" });
     });
+
+    console.log("Yielding wallet control to eosio.code...");
+    await eos.transaction("eosio", eosio => {
+        eosio.updateauth(config.walletName, "active", "owner", {
+            threshold: 1,
+            keys: [],
+            accounts: [{ permission: { actor: config.walletName, permission: "eosio.code" }, weight: 1 }],
+            waits: []
+        });
+    });
+    await eos.transaction("eosio", eosio => {
+        eosio.updateauth(config.walletName, "owner", "", {
+            threshold: 1,
+            keys: [],
+            accounts: [{ permission: { actor: config.walletName, permission: "eosio.code" }, weight: 1 }],
+            waits: []
+        }, { authorization: config.walletName + "@owner" });
+    });
+
+    console.log("Filling demo data...");
+
+    await eos.transaction("eosio", eosio => {
+        eosio.updateauth(config.executorName, "owner", "", {
+            threshold: 3,
+            keys: [
+                { key: ecc.privateToPublic(config.executorOwner1), weight: 1 },
+                { key: ecc.privateToPublic(config.executorOwner2), weight: 1 },
+                { key: ecc.privateToPublic(config.executorOwner3), weight: 1 }
+            ],
+            accounts: [],
+            waits: []
+        }, { authorization: config.executorName + "@owner" });
+    });
+
+    await createNewAccount(eos, config.cfoName, ecc.privateToPublic(config.cfoKey));
+
+    await eos.transaction("eosio", eosio => {
+        eosio.updateauth(config.executorName, "active", "owner", {
+            threshold: 1,
+            keys: [],
+            accounts: [{ permission: { actor: config.cfoName, permission: "active" }, weight: 1 }],
+            waits: []
+        }, { authorization: config.executorName + "@active" });
+    });
+
+    await eos.transaction("eosio", eosio => {
+        eosio.updateauth(config.executorName, config.permissionAddDepartment, "active", {
+            threshold: 1,
+            keys: [],
+            accounts: [{ permission: { actor: config.cfoName, permission: "active" }, weight: 1 }],
+            waits: []
+        }, { authorization: config.executorName + "@active" });
+        eosio.linkauth(config.executorName, config.walletName, config.actionAddDepartment, config.permissionAddDepartment);
+    });
+
+    await createNewAccount(eos, config.mkgMgrName, ecc.privateToPublic(config.mktMgrKey));
+    await createNewAccount(eos, config.mktProgram1Name, ecc.privateToPublic(config.recipientKey));
+    await createNewAccount(eos, config.mktProgram2Name, ecc.privateToPublic(config.recipientKey));
+
+    await eos.transaction(["eosio", config.walletName], contracts => {
+        contracts["eosio"].updateauth(config.executorName, config.mktPermissionName, "active", {
+            threshold: 1,
+            keys: [],
+            accounts: [{ permission: { actor: config.mkgMgrName, permission: "active" }, weight: 1 }],
+            waits: []
+        }, { authorization: config.executorName + "@active" });
+        contracts[config.walletName].newdept("Marketing", config.mktPermissionName, { authorization: config.executorName + "@" + config.permissionAddDepartment });
+    });
+
+    console.log("System ready for demo!");
 }
 
 run();
