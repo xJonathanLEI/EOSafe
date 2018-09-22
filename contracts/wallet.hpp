@@ -12,6 +12,11 @@ class wallet : public contract
     using contract::contract;
 
     /* Constants */
+
+    const uint8_t APPLICATION_STATUS_PENDING = 1;
+    const uint8_t APPLICATION_STATUS_APPROVED = 2;
+    const uint8_t APPLICATION_STATUS_REJECTED = 3;
+
     const permission_name PERMISSION_ADD_DEPARTMENT = N(newdept);
     const permission_name PERMISSION_TOGGLE_DEPARTMENT = N(tgldept);
 
@@ -31,6 +36,7 @@ class wallet : public contract
 
     typedef singleton<N(configs), config> tbl_configs;
     typedef multi_index<N(departments), department> tbl_departments;
+    typedef multi_index<N(applications), application> tbl_applications;
 
     /* Interfaces */
 
@@ -40,6 +46,8 @@ class wallet : public contract
     void newdept(string name, permission_name permission);
     /// @abi action toggledept
     void toggledept(uint64_t id, bool enabled);
+    /// @abi action setdeptlmt
+    void setdeptlmt(uint64_t id, uint64_t new_allowance);
 
   private:
     config get_config();
@@ -55,7 +63,7 @@ extern "C"
         {
             switch (action)
             {
-                EOSIO_API(wallet, (init)(newdept)(toggledept))
+                EOSIO_API(wallet, (init)(newdept)(toggledept)(setdeptlmt))
             }
         }
     }

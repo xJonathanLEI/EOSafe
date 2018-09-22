@@ -64,6 +64,43 @@ void wallet::toggledept(uint64_t id, bool enabled)
     });
 }
 
+void wallet::setdeptlmt(uint64_t id, uint64_t new_allowance)
+{
+    // Gets the department
+    tbl_departments departments(_self, _self);
+    auto department = departments.find(id);
+    eosio_assert(department != departments.end(), "The department does not exist");
+
+    // Checks auth
+    auto configs = get_config();
+    require_auth2(configs.executor, department->permission);
+
+    // Checks if a pending application for this department exists
+    //
+    // Using iterations here for easier front-end queries (demo purpose)
+    // (Possible optimization: use scope and PK for fast retrival)
+    //
+    tbl_applications applications(_self, _self);
+    for (auto it = applications.begin(); it != applications.end(); it++)
+        eosio_assert(it->department_id != id || it->status != APPLICATION_STATUS_PENDING, "A pending application for this department already exists");
+
+    // Finds next application id
+    auto last_application = applications.rbegin();
+    uint64_t next_application_id = last_application == applications.rend() ? 1 : last_application->application_id + 1;
+
+    // The allowance must be changed
+    eosio_assert(department->monthly_allowance != new_allowance, "Allowance is not being changed");
+
+    // Creates the application
+    applications.emplace(_self, [&](application &new_application) {
+        new_application.application_id = next_application_id;
+        new_application.department_id = id;
+        new_application.from_allowance = department->monthly_allowance;
+        new_application.to_allowance = new_allowance;
+        new_application.status = APPLICATION_STATUS_PENDING;
+    });
+}
+
 config wallet::get_config()
 {
     tbl_configs configs(_self, _self);
