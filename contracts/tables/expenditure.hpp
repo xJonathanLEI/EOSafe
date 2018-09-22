@@ -1,22 +1,19 @@
 #pragma once
 
 #include <eosiolib/eosio.hpp>
-#include <eosiolib/asset.hpp>
 
 #include <string>
 
 using namespace std;
 using namespace eosio;
 
-/// @abi table departments
-struct department
+/// @abi table expenditures
+struct expenditure
 {
     uint64_t id;
     string name;
-    permission_name permission;
-    bool enabled = true;
-    uint64_t monthly_allowance = 0;
-    uint64_t allowance_allocated = 0;
+    account_name recipient;
+    uint64_t monthly_allowance;
 
     auto primary_key() const
     {

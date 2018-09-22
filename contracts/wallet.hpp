@@ -38,6 +38,7 @@ class wallet : public contract
     typedef singleton<N(configs), config> tbl_configs;
     typedef multi_index<N(departments), department> tbl_departments;
     typedef multi_index<N(applications), application> tbl_applications;
+    typedef multi_index<N(expenditures), expenditure> tbl_expenditures;
 
     /* Interfaces */
 
