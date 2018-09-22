@@ -125,6 +125,7 @@ void wallet::processapp(uint64_t id, bool approve)
     // Changes the allowance
     tbl_departments departments(_self, _self);
     auto department = departments.find(application->department_id);
+    eosio_assert(application->to_allowance >= department->allowance_allocated, "Insufficient allocation after approval");
     departments.modify(department, _self, [&](::department &modified_department) {
         modified_department.monthly_allowance = application->to_allowance;
     });
