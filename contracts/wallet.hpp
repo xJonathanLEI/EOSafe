@@ -11,6 +11,9 @@ class wallet : public contract
   public:
     using contract::contract;
 
+    /* Constants */
+    const permission_name PERMISSION_ADD_DEPARTMENT = N(newdept);
+
     /* Structs */
 
     struct currency_stats
@@ -26,6 +29,7 @@ class wallet : public contract
     /* Tables */
 
     typedef singleton<N(configs), config> tbl_configs;
+    typedef multi_index<N(departments), department> tbl_departments;
 
     /* Interfaces */
 
