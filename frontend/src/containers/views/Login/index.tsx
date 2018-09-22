@@ -3,8 +3,10 @@ import { inject, observer } from 'mobx-react'
 import { observable, runInAction } from 'mobx'
 import { Form, Icon, Input, Button } from 'antd'
 import { FormComponentProps } from 'antd/lib/form'
+import {Alert} from "reactstrap"
 
 import * as styles from './index.scss'
+// import ScatterJS from 'scatter-js/dist/scatter.esm'
 
 const FormItem = Form.Item
 
@@ -53,6 +55,14 @@ class Login extends React.Component<IStoreProps & FormComponentProps> {
                     <div className={styles.logoBox}>
                         <Icon type="ant-design" />
                     </div>
+                    <div>
+                        <Alert color="success">
+                            <p>EOS Enterprise</p>
+                            <p>Wallet</p>
+                        </Alert>
+                        <Button type="primary" size="large" onClick={this.authorizeScatter()}>Login With Scatter</Button>
+                    </div>
+
                     <FormItem hasFeedback>
                         {getFieldDecorator('account', {
                             rules: [
@@ -94,6 +104,31 @@ class Login extends React.Component<IStoreProps & FormComponentProps> {
                 </Form>
             </div>
         )
+    }
+
+    private authorizeScatter() {
+        // const network = {
+        //     blockchain: 'eos',
+        //     protocol: 'https',
+        //     host: 'nodes.get-scatter.com',
+        //     port: 443,
+        //     chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
+        // }
+        //
+        // ScatterJS.scatter.connect('xxx').then(connected => {
+        //
+        //     if (!connected) return false;
+        //
+        //     const scatter = ScatterJS.scatter;
+        //
+        //     const requiredFields = {accounts: [network]};
+        //     scatter.getIdentity(requiredFields).then(() => {
+        //
+        //     }).catch(error => {
+        //         console.error(error);
+        //     });
+        // });
+        return undefined;
     }
 }
 
