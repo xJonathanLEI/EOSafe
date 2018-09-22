@@ -312,15 +312,18 @@ void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amo
     // Changes expenditure allowance used
     expenditures.modify(expenditure, _self, [&](::expenditure &modified_expenditure) {
         modified_expenditure.allowance_used = new_used_expenditure_allownance;
+        modified_expenditure.last_spend_time = now();
     });
 
     // Changes department allowance used
     departments.modify(department, _self, [&](::department &modified_department) {
         modified_department.allowance_used = new_used_department_allowance;
+        modified_department.last_spend_time = now();
     });
 
     // Changes system allowance used
     config.system_limit_used = new_used_system_allowance;
+    config.last_spend_time = now();
     configs.set(config, _self);
 
     // Adds to expense history
