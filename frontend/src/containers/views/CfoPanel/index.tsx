@@ -63,6 +63,9 @@ class CfoPanel extends React.Component {
                     <Button type="danger">Deny</Button>
                     <h4>Allowance: 1000->2000</h4>
                 </div>
+
+                <img src={require('./WechatIMG164.jpeg') } />
+
             </div>
         )
     }

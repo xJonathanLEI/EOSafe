@@ -115,6 +115,8 @@ class ExpenseDetailPage extends ComponentExt<IProps & FormComponentProps> {
                     <h3>Expense History</h3>
                     <ExpenseHistory/>
                 </div>
+
+                <img src={require('./WechatIMG159.jpeg') } />
             </div>
         )
     }
