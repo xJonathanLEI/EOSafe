@@ -26,4 +26,11 @@
             text-align: center;
         }
     }
+
+    img {
+        display: block;
+        object-fit: contain;
+        width: auto;
+        height: auto;
+    }
 }
