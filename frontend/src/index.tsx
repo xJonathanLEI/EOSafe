@@ -7,6 +7,7 @@ import { configure } from 'mobx'
 import createHashHistory from 'history/createHashHistory'
 import { syncHistoryWithStore } from 'mobx-react-router'
 import { Router } from 'react-router-dom'
+import { loadIcons } from './config/icon-loader';
 
 import AppRouter from '@shared/App'
 import * as store from './store'
@@ -15,7 +16,7 @@ const hashHistory = createHashHistory()
 const history = syncHistoryWithStore(hashHistory, store.routerStore)
 
 configure({ enforceActions: 'observed' })
-
+loadIcons();
 const render = Component => {
     ReactDOM.render(
         <Provider {...store}>

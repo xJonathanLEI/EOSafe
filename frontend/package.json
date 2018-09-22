@@ -23,6 +23,10 @@
     "author": "jackple",
     "license": "MIT",
     "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "1.2.2",
+        "@fortawesome/free-brands-svg-icons": "^5.3.1",
+        "@fortawesome/free-solid-svg-icons": "5.2.0",
+        "@fortawesome/react-fontawesome": "0.1.0",
         "antd": "^3.9.2",
         "axios": "^0.18.0",
         "bourbon": "^5.1.0",
