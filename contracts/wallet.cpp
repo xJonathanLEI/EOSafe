@@ -144,7 +144,10 @@ void wallet::addexpense(uint64_t department_id, string name, account_name recipi
     // Recipient must exist
     eosio_assert(is_account(recipient), "The recipient account does not exist");
 
-    // TODO: check to ensure allowance allocated is not exceeded
+    // Checks allowance allocation
+    uint64_t new_allowance_allocated = department->allowance_allocated + monthly_allowance;
+    eosio_assert(new_allowance_allocated > department->allowance_allocated, "Allowance overflow");
+    eosio_assert(new_allowance_allocated <= department->monthly_allowance, "Allowance overdrawn");
 
     // Finds next expenditure id
     tbl_expenditures expenditures(_self, department_id);
@@ -157,6 +160,11 @@ void wallet::addexpense(uint64_t department_id, string name, account_name recipi
         new_expenditure.name = name;
         new_expenditure.recipient = recipient;
         new_expenditure.monthly_allowance = monthly_allowance;
+    });
+
+    // Modifies the department allowance allocation
+    departments.modify(department, _self, [&](::department &modified_department) {
+        modified_department.allowance_allocated = new_allowance_allocated;
     });
 }
 
