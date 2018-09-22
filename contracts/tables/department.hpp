@@ -14,6 +14,8 @@ struct department
     uint64_t id;
     string name;
     permission_name permission;
+    bool enabled = true;
+    uint64_t monthly_allowance = 0;
 
     auto primary_key() const
     {

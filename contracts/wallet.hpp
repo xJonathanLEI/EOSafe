@@ -35,6 +35,11 @@ class wallet : public contract
 
     /// @abi action init
     void init(account_name executor, extended_symbol token);
+    /// @abi action newdept
+    void newdept(string name, permission_name permission);
+
+  private:
+    config get_config();
 };
 
 extern "C"

@@ -24,3 +24,29 @@ void wallet::init(account_name executor, extended_symbol token)
         .token = token};
     configs.set(new_config, _self);
 }
+
+void wallet::newdept(string name, permission_name permission)
+{
+    // Checks auth
+    auto configs = get_config();
+    require_auth2(configs.executor, PERMISSION_ADD_DEPARTMENT);
+
+    // Finds next department id
+    tbl_departments departments(_self, _self);
+    auto last_department = departments.rbegin();
+    uint64_t next_dept_id = last_department == departments.rend() ? 1 : last_department->id + 1;
+
+    // Creates the department
+    departments.emplace(_self, [&](department &new_department) {
+        new_department.id = next_dept_id;
+        new_department.name = name;
+        new_department.permission = permission;
+    });
+}
+
+config wallet::get_config()
+{
+    tbl_configs configs(_self, _self);
+    eosio_assert(configs.exists(), "The contract has not been initialized");
+    return configs.get();
+}
