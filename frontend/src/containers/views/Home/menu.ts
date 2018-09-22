@@ -16,7 +16,8 @@ export const asynchronousComponents = {
     ),
     ChartPie: loadComponent(() => import(/* webpackChunkName: "chart-pie" */ '@views/Charts/Pie')),
     Users: loadComponent(() => import(/* webpackChunkName: "users" */ '@views/Users')),
-    CfoPanel: loadComponent(() => import('@views/CfoPanel'))
+    CfoPanel: loadComponent(() => import('@views/CfoPanel')),
+    PlaceHolderPanel: loadComponent(() => import('@views/PlaceHolderPanel')),
 }
 
 // 所有路由的key
@@ -95,6 +96,14 @@ export const menu: IMenu[] = [
         title: 'CFO Controls',
         icon: 'user',
         component: 'CfoPanel',
+        exact: true
+    },
+    {
+        id: 888888,
+        path: '/placeholder',
+        title: 'Placeholder Panels',
+        icon: 'tag',
+        component: 'PlaceHolderPanel',
         exact: true
     },
 ]
