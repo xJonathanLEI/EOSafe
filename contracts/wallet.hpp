@@ -3,6 +3,8 @@
 #include <eosiolib/singleton.hpp>
 #include <eosiolib/transaction.hpp>
 
+#include <time.h>
+
 #include "tables/tables.hpp"
 
 using namespace eosio;
@@ -69,6 +71,7 @@ class wallet : public contract
 
   private:
     config get_config();
+    uint64_t add_spend(uint64_t spend_before, uint64_t add_spend, uint32_t last_spend_time);
 };
 
 extern "C"

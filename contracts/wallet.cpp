@@ -188,19 +188,12 @@ void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amo
     eosio_assert(expenditure != expenditures.end(), "Expenditure does not exist");
 
     // Checks allowance
-    // TODO: check new month and clear the amount
-    uint64_t new_used_expenditure_allownance = expenditure->allowance_used + amount;
-    uint64_t new_used_department_allowance = department->allowance_used + amount;
-    {
-        // Expenditure level
-        eosio_assert(new_used_expenditure_allownance > expenditure->allowance_used, "Allowance overflow");
-        eosio_assert(new_used_expenditure_allownance <= expenditure->monthly_allowance, "Allowance overdrawn");
-    }
-    {
-        // Department level
-        eosio_assert(new_used_department_allowance > department->allowance_used, "Allowance overflow");
-        eosio_assert(new_used_department_allowance <= department->monthly_allowance, "Allowance overdrawn");
-    }
+    uint64_t new_used_expenditure_allownance = add_spend(expenditure->allowance_used, amount, expenditure->last_spend_time);
+    uint64_t new_used_department_allowance = add_spend(department->allowance_used, amount, department->last_spend_time);
+    // Expenditure level
+    eosio_assert(new_used_expenditure_allownance <= expenditure->monthly_allowance, "Allowance overdrawn");
+    // Department level
+    eosio_assert(new_used_department_allowance <= department->monthly_allowance, "Allowance overdrawn");
 
     // Sends the token
     transfer_args token_transfer{
@@ -237,6 +230,29 @@ void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amo
         new_expense.amount = amount;
         new_expense.memo = memo;
     });
+}
+
+uint64_t wallet::add_spend(uint64_t spend_before, uint64_t add_spend, uint32_t last_spend_time)
+{
+    time_t time_last = (long)last_spend_time;
+    time_t time_now = (long)now();
+
+    tm *tm_last = gmtime(&time_last);
+    tm *tm_now = gmtime(&time_now);
+
+    if (tm_last->tm_year == tm_now->tm_year && tm_last->tm_mon == tm_now->tm_mon)
+    {
+        // Same month
+        uint64_t new_spend = spend_before + add_spend;
+        eosio_assert(new_spend > spend_before, "Amount overflow");
+
+        return new_spend;
+    }
+    else
+    {
+        // Different month
+        return add_spend;
+    }
 }
 
 config wallet::get_config()
