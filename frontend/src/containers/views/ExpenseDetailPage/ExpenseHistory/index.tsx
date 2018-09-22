@@ -6,29 +6,15 @@ import {FormComponentProps} from 'antd/lib/form'
 
 import {ComponentExt} from '@utils/reactExt'
 import Column from "antd/lib/table/Column";
-import Tag from "antd/lib/tag";
-
 import Table from "antd/lib/table/Table";
 
-const FormItem = Form.Item
 
-const formItemLayout = {
-    labelCol: {
-        xs: {span: 24},
-        sm: {span: 5}
-    },
-    wrapperCol: {
-        xs: {span: 24},
-        sm: {span: 19}
-    }
-}
 //(time, txid, memo, cost)
 const data = [{
     key: 1,
     time: '1999 1 1 1:11:11',
     txid: '0xdsklfdjsklafdfsklfdsjklfkldsfklds',
     memo: "spend for jxxx",
-    tags: ['nice', 'developer'],
     cost: "100.0000 EOS",
 }]
 
@@ -83,14 +69,6 @@ class ExpenseHistory extends ComponentExt<IProps & FormComponentProps> {
                     title="Cost"
                     dataIndex="cost"
                     key="cost"
-                />
-                <Column
-                    title="Tags"
-                    dataIndex="tags"
-                    key="tags"
-                    render={tags => (
-                        <span>{tags.map(tag => <Tag color="blue" key={tag}>{tag}</Tag>)}</span>
-                    )}
                 />
             </Table>
         )
