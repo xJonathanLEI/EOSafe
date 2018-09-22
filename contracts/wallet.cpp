@@ -273,8 +273,10 @@ void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amo
     eosio_assert(department != departments.end(), "The department does not exist");
 
     // Checks auth
-    auto configs = get_config();
-    require_auth2(configs.executor, department->permission);
+    tbl_configs configs(_self, _self);
+    eosio_assert(configs.exists(), "The contract has not been initialized");
+    auto config = configs.get();
+    require_auth2(config.executor, department->permission);
 
     // Gets expenditure
     tbl_expenditures expenditures(_self, department_id);
@@ -290,18 +292,21 @@ void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amo
     // Checks allowance
     uint64_t new_used_expenditure_allownance = add_spend(expenditure->allowance_used, amount, expenditure->last_spend_time);
     uint64_t new_used_department_allowance = add_spend(department->allowance_used, amount, department->last_spend_time);
+    uint64_t new_used_system_allowance = add_spend(config.system_limit_used, amount, config.last_spend_time);
     // Expenditure level
     eosio_assert(new_used_expenditure_allownance <= expenditure->monthly_allowance, "Allowance overdrawn");
     // Department level
     eosio_assert(new_used_department_allowance <= department->monthly_allowance, "Allowance overdrawn");
+    // System level
+    eosio_assert(new_used_system_allowance <= config.system_monthly_limit, "Allowance overdrawn");
 
     // Sends the token
     transfer_args token_transfer{
         .from = _self,
         .to = expenditure->recipient,
-        .quantity = asset(amount, symbol_type(configs.token.value)),
+        .quantity = asset(amount, symbol_type(config.token.value)),
         .memo = memo};
-    action(permission_level{_self, N(active)}, configs.token.contract, N(transfer), token_transfer)
+    action(permission_level{_self, N(active)}, config.token.contract, N(transfer), token_transfer)
         .send();
 
     // Changes expenditure allowance used
@@ -313,6 +318,10 @@ void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amo
     departments.modify(department, _self, [&](::department &modified_department) {
         modified_department.allowance_used = new_used_department_allowance;
     });
+
+    // Changes system allowance used
+    config.system_limit_used = new_used_system_allowance;
+    configs.set(config, _self);
 
     // Adds to expense history
     //
