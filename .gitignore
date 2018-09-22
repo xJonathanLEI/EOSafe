@@ -15,5 +15,9 @@
 
 contracts/build/
 
-# Some VS Code Configs
+# Bootstrapping files
+bootstrapping/node_modules
+
+# Some VS Code configs
+
 .vscode/settings.json
