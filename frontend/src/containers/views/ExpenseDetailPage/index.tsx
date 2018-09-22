@@ -7,6 +7,7 @@ import {Form, Input} from "antd";
 import {ComponentExt} from "@utils/reactExt";
 import {FormComponentProps} from "antd/lib/form";
 import {IStoreProps} from "@shared/PrivateRoute";
+import ExpenseHistory from "@views/ExpenseDetailPage/ExpenseHistory";
 const FormItem = Form.Item
 
 const formItemLayout = {
@@ -108,6 +109,11 @@ class ExpenseDetailPage extends ComponentExt<IProps & FormComponentProps> {
                             })(<Input />)}
                         </FormItem>
                     </Form>
+                </div>
+
+                <div>
+                    <h3>Expense History</h3>
+                    <ExpenseHistory/>
                 </div>
             </div>
         )
