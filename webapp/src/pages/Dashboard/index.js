@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Card, Col, Row } from 'antd';
+import { Card, Col, Row, Divider } from 'antd';
+
+import ExpenditureDisplay from "../../components/ExpenditureDisplay";
 
 class Dashborad extends Component {
 
@@ -49,6 +51,7 @@ class Dashborad extends Component {
                             activeTabKey={this.state.key}
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}
                         >
+                            <ExpenditureDisplay />
                         </Card>
                     </Col>
                     <Col span={12}>
@@ -59,6 +62,65 @@ class Dashborad extends Component {
                             activeTabKey={this.state.key}
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}
                         >
+                            <Row gutter={16}>
+                                <Col span={8}>
+                                    <p style={{ margin: 0, color: "grey" }}>2018-08-20 16:00:00</p>
+                                </Col>
+                                <Col span={8}>
+                                    <p style={{ margin: 0 }}>Recruit Ads.</p>
+                                </Col>
+                                <Col span={8}>
+                                    <p style={{ margin: 0, fontWeight: "bold", textAlign: "right" }}>- 1000.0000 EOS</p>
+                                </Col>
+                            </Row>
+                            <Divider />
+                            <Row gutter={16}>
+                                <Col span={8}>
+                                    <p style={{ margin: 0, color: "grey" }}>2018-08-20 16:00:00</p>
+                                </Col>
+                                <Col span={8}>
+                                    <p style={{ margin: 0 }}>Recruit Ads.</p>
+                                </Col>
+                                <Col span={8}>
+                                    <p style={{ margin: 0, fontWeight: "bold", textAlign: "right" }}>- 1000.0000 EOS</p>
+                                </Col>
+                            </Row>
+                            <Divider />
+                            <Row gutter={16}>
+                                <Col span={8}>
+                                    <p style={{ margin: 0, color: "grey" }}>2018-08-20 16:00:00</p>
+                                </Col>
+                                <Col span={8}>
+                                    <p style={{ margin: 0 }}>Recruit Ads.</p>
+                                </Col>
+                                <Col span={8}>
+                                    <p style={{ margin: 0, fontWeight: "bold", textAlign: "right" }}>- 1000.0000 EOS</p>
+                                </Col>
+                            </Row>
+                            <Divider />
+                            <Row gutter={16}>
+                                <Col span={8}>
+                                    <p style={{ margin: 0, color: "grey" }}>2018-08-20 16:00:00</p>
+                                </Col>
+                                <Col span={8}>
+                                    <p style={{ margin: 0 }}>Recruit Ads.</p>
+                                </Col>
+                                <Col span={8}>
+                                    <p style={{ margin: 0, fontWeight: "bold", textAlign: "right" }}>- 1000.0000 EOS</p>
+                                </Col>
+                            </Row>
+                            <Divider />
+                            <Row gutter={16}>
+                                <Col span={8}>
+                                    <p style={{ margin: 0, color: "grey" }}>2018-08-20 16:00:00</p>
+                                </Col>
+                                <Col span={8}>
+                                    <p style={{ margin: 0 }}>Recruit Ads.</p>
+                                </Col>
+                                <Col span={8}>
+                                    <p style={{ margin: 0, fontWeight: "bold", textAlign: "right" }}>- 1000.0000 EOS</p>
+                                </Col>
+                            </Row>
                         </Card>
                     </Col>
                 </Row>
