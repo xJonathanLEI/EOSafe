@@ -69,7 +69,7 @@ class wallet : public contract
     /// @abi action setsyslmt
     void setsyslmt(uint64_t new_allowance);
     /// @abi action newdept
-    void newdept(string name, permission_name permission);
+    void newdept(string name, account_name manager);
     /// @abi action toggledept
     void toggledept(uint64_t id, bool enabled);
     /// @abi action setdeptlmt

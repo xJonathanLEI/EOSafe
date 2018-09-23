@@ -39,11 +39,14 @@ void wallet::setsyslmt(uint64_t new_allowance)
     configs.set(config, _self);
 }
 
-void wallet::newdept(string name, permission_name permission)
+void wallet::newdept(string name, account_name manager)
 {
     // Checks auth
     auto configs = get_config();
     require_auth2(configs.executor, PERMISSION_ADD_DEPARTMENT);
+
+    // The manager account must exist
+    eosio_assert(is_account(manager), "The manager account does not exist");
 
     // Finds next department id
     tbl_departments departments(_self, _self);
@@ -54,7 +57,7 @@ void wallet::newdept(string name, permission_name permission)
     departments.emplace(_self, [&](department &new_department) {
         new_department.id = next_dept_id;
         new_department.name = name;
-        new_department.permission = permission;
+        new_department.manager = manager;
     });
 }
 
@@ -86,8 +89,7 @@ void wallet::setdeptlmt(uint64_t id, uint64_t new_allowance)
     eosio_assert(department != departments.end(), "The department does not exist");
 
     // Checks auth
-    auto configs = get_config();
-    require_auth2(configs.executor, department->permission);
+    require_auth(department->manager);
 
     // Checks if a pending application for this department exists
     //
@@ -153,8 +155,7 @@ void wallet::addexpense(uint64_t department_id, string name, account_name recipi
     eosio_assert(department != departments.end(), "The department does not exist");
 
     // Checks auth
-    auto configs = get_config();
-    require_auth2(configs.executor, department->permission);
+    require_auth(department->manager);
 
     // Recipient must exist
     eosio_assert(is_account(recipient), "The recipient account does not exist");
@@ -191,8 +192,7 @@ void wallet::rmexpense(uint64_t department_id, uint64_t expenditure_id)
     eosio_assert(department != departments.end(), "The department does not exist");
 
     // Checks auth
-    auto configs = get_config();
-    require_auth2(configs.executor, department->permission);
+    require_auth(department->manager);
 
     // Gets the expenditure
     tbl_expenditures expenditures(_self, department_id);
@@ -223,8 +223,7 @@ void wallet::adjexpense(uint64_t department_id, uint64_t expenditure_id, uint64_
     eosio_assert(department != departments.end(), "The department does not exist");
 
     // Checks auth
-    auto configs = get_config();
-    require_auth2(configs.executor, department->permission);
+    require_auth(department->manager);
 
     // Gets expenditure
     tbl_expenditures expenditures(_self, department_id);
@@ -276,7 +275,7 @@ void wallet::spend(uint64_t department_id, uint64_t expenditure_id, uint64_t amo
     tbl_configs configs(_self, _self);
     eosio_assert(configs.exists(), "The contract has not been initialized");
     auto config = configs.get();
-    require_auth2(config.executor, department->permission);
+    require_auth(department->manager);
 
     // Gets expenditure
     tbl_expenditures expenditures(_self, department_id);

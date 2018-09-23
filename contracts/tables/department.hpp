@@ -13,7 +13,7 @@ struct department
 {
     uint64_t id;
     string name;
-    permission_name permission;
+    account_name manager;
     bool enabled = true;
     uint64_t monthly_allowance = 0;
     uint64_t allowance_allocated = 0;
