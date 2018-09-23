@@ -7146,19 +7146,15 @@
     (i64.const 1000000)
    )
   )
-  (set_local $17
-   (call $gmtime
-    (i32.add
-     (get_local $20)
-     (i32.const 88)
-    )
-   )
-  )
   (set_local $12
-   (call $gmtime
-    (i32.add
-     (get_local $20)
-     (i32.const 48)
+   (i32.load offset=16
+    (tee_local $17
+     (call $gmtime
+      (i32.add
+       (get_local $20)
+       (i32.const 88)
+      )
+     )
     )
    )
   )
@@ -7169,17 +7165,22 @@
       (get_local $17)
      )
      (i32.load offset=20
-      (get_local $12)
+      (tee_local $17
+       (call $gmtime
+        (i32.add
+         (get_local $20)
+         (i32.const 48)
+        )
+       )
+      )
      )
     )
    )
    (br_if $label$5
     (i32.ne
+     (get_local $12)
      (i32.load offset=16
       (get_local $17)
-     )
-     (i32.load offset=16
-      (get_local $12)
      )
     )
    )
@@ -7223,19 +7224,15 @@
     (i64.const 1000000)
    )
   )
-  (set_local $17
-   (call $gmtime
-    (i32.add
-     (get_local $20)
-     (i32.const 88)
-    )
-   )
-  )
   (set_local $12
-   (call $gmtime
-    (i32.add
-     (get_local $20)
-     (i32.const 48)
+   (i32.load offset=16
+    (tee_local $17
+     (call $gmtime
+      (i32.add
+       (get_local $20)
+       (i32.const 88)
+      )
+     )
     )
    )
   )
@@ -7246,17 +7243,22 @@
       (get_local $17)
      )
      (i32.load offset=20
-      (get_local $12)
+      (tee_local $17
+       (call $gmtime
+        (i32.add
+         (get_local $20)
+         (i32.const 48)
+        )
+       )
+      )
      )
     )
    )
    (br_if $label$6
     (i32.ne
+     (get_local $12)
      (i32.load offset=16
       (get_local $17)
-     )
-     (i32.load offset=16
-      (get_local $12)
      )
     )
    )
@@ -7300,19 +7302,15 @@
     (i64.const 1000000)
    )
   )
-  (set_local $17
-   (call $gmtime
-    (i32.add
-     (get_local $20)
-     (i32.const 88)
-    )
-   )
-  )
   (set_local $12
-   (call $gmtime
-    (i32.add
-     (get_local $20)
-     (i32.const 48)
+   (i32.load offset=16
+    (tee_local $17
+     (call $gmtime
+      (i32.add
+       (get_local $20)
+       (i32.const 88)
+      )
+     )
     )
    )
   )
@@ -7323,17 +7321,22 @@
       (get_local $17)
      )
      (i32.load offset=20
-      (get_local $12)
+      (tee_local $17
+       (call $gmtime
+        (i32.add
+         (get_local $20)
+         (i32.const 48)
+        )
+       )
+      )
      )
     )
    )
    (br_if $label$7
     (i32.ne
+     (get_local $12)
      (i32.load offset=16
       (get_local $17)
-     )
-     (i32.load offset=16
-      (get_local $12)
      )
     )
    )
@@ -24349,19 +24352,15 @@
     (i64.const 1000000)
    )
   )
-  (set_local $3
-   (call $gmtime
-    (i32.add
-     (get_local $5)
-     (i32.const 12)
-    )
-   )
-  )
   (set_local $4
-   (call $gmtime
-    (i32.add
-     (get_local $5)
-     (i32.const 8)
+   (i32.load offset=16
+    (tee_local $3
+     (call $gmtime
+      (i32.add
+       (get_local $5)
+       (i32.const 12)
+      )
+     )
     )
    )
   )
@@ -24372,17 +24371,22 @@
       (get_local $3)
      )
      (i32.load offset=20
-      (get_local $4)
+      (tee_local $3
+       (call $gmtime
+        (i32.add
+         (get_local $5)
+         (i32.const 8)
+        )
+       )
+      )
      )
     )
    )
    (br_if $label$0
     (i32.ne
+     (get_local $4)
      (i32.load offset=16
       (get_local $3)
-     )
-     (i32.load offset=16
-      (get_local $4)
      )
     )
    )

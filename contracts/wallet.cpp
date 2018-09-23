@@ -349,9 +349,14 @@ uint64_t wallet::add_spend(uint64_t spend_before, uint64_t add_spend, uint32_t l
     time_t time_now = (long)now();
 
     tm *tm_last = gmtime(&time_last);
-    tm *tm_now = gmtime(&time_now);
+    int last_year = tm_last->tm_year;
+    int last_month = tm_last->tm_mon;
 
-    if (tm_last->tm_year == tm_now->tm_year && tm_last->tm_mon == tm_now->tm_mon)
+    tm *tm_now = gmtime(&time_now);
+    int now_year = tm_now->tm_year;
+    int now_month = tm_now->tm_mon;
+
+    if (last_year == now_year && last_month == now_month)
     {
         // Same month
         uint64_t new_spend = spend_before + add_spend;
