@@ -6,11 +6,7 @@ import Eos from "eosjs";
 import DepartmentsDisplay from "../../components/DepartmentsDisplay";
 import ApplicationsDisplay from "../../components/ApplicationsDisplay";
 
-const eos = Eos({
-    httpEndpoint: "http://127.0.0.1:8888",
-    chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
-    keyProvider: JSON.parse(sessionStorage.getItem("privateKey"))
-});
+let eos;
 
 class CFODashboard extends Component {
 
@@ -34,6 +30,17 @@ class CFODashboard extends Component {
             return;
         }
 
+        const keys = JSON.parse(sessionStorage.getItem("privateKey"));
+        const provider = new Array();
+        for (let i = 0; i < keys.length; i++)
+            provider.push(keys[i]);
+
+        eos = Eos({
+            httpEndpoint: "http://127.0.0.1:8888",
+            chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
+            keyProvider: provider
+        });
+
         this.pageInit();
     }
 
@@ -50,6 +57,7 @@ class CFODashboard extends Component {
             const currentDepartment = departments[i];
             departmentNames[currentDepartment.id] = currentDepartment.name;
             displayedDepartments.push({
+                id: currentDepartment.id,
                 name: currentDepartment.name,
                 enabled: currentDepartment.enabled,
                 total: this.scaleAmount(currentDepartment.monthly_allowance, token.precision),
@@ -124,6 +132,26 @@ class CFODashboard extends Component {
         this.pageInit();
     }
 
+    handleSuspend = async (id) => {
+        await eos.transaction("wallet", wallet => {
+            wallet.toggledept(id, 0, { authorization: "executor@tgldept" });
+        });
+
+        this.pageInit();
+    }
+
+    handleResume = async (id) => {
+        await eos.transaction("wallet", wallet => {
+            wallet.toggledept(id, 1, { authorization: "executor@tgldept" });
+        });
+
+        this.pageInit();
+    }
+
+    handleRemoval = async (id) => {
+
+    }
+
     showModal = () => {
         this.setState({
             newDepartmentModalVisibility: true,
@@ -186,7 +214,7 @@ class CFODashboard extends Component {
                             activeTabKey={this.state.key}
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}>
                             {
-                                this.state.departments ? <DepartmentsDisplay departments={this.state.departments} /> : null
+                                this.state.departments ? <DepartmentsDisplay onSuspend={this.handleSuspend} onResume={this.handleResume} departments={this.state.departments} /> : null
                             }
                         </Card>
                     </Col>

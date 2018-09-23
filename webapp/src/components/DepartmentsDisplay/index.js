@@ -15,9 +15,9 @@ class DepartmentsDisplay extends Component {
                                 </Col>
                                 <Col span={14} style={{ textAlign: "right" }}>
                                     {
-                                        value.enabled ? <Button type="dashed">Suspend</Button>
-                                            : <Button type="primary">Resume</Button>
-                                    } <Button type="danger">Remove</Button>
+                                        value.enabled ? <Button type="dashed" onClick={() => { this.props.onSuspend(value.id) }}>Suspend</Button>
+                                            : <Button type="primary" onClick={() => { this.props.onResume(value.id) }}>Resume</Button>
+                                    } <Button type="danger" onClick={() => { this.props.onRemoval(value.id) }}>Remove</Button>
                                 </Col>
                             </Row>
                             <Row gutter={16} style={{ paddingTop: 10, marginBottom: 0 }}>

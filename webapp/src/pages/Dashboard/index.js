@@ -6,11 +6,7 @@ import ecc from "eosjs-ecc";
 
 import ExpenditureDisplay from "../../components/ExpenditureDisplay";
 
-const eos = Eos({
-    httpEndpoint: "http://127.0.0.1:8888",
-    chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
-    keyProvider: JSON.parse(sessionStorage.getItem("privateKey"))
-});
+let eos;
 
 class Dashborad extends Component {
 
@@ -38,7 +34,18 @@ class Dashborad extends Component {
             this.props.history.push("/");
             return;
         }
-        
+
+        const keys = JSON.parse(sessionStorage.getItem("privateKey"));
+        const provider = new Array();
+        for (let i = 0; i < keys.length; i++)
+            provider.push(keys[i]);
+
+        eos = Eos({
+            keyProvider: provider,
+            httpEndpoint: "http://127.0.0.1:8888",
+            chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
+        });
+
         this.pageInit();
     }
 
@@ -140,7 +147,7 @@ class Dashborad extends Component {
         const newAmount = Math.round(Number.parseFloat(this.state.newAllowance) * Math.pow(10, this.state.tokenPrecision));
 
         await eos.transaction("wallet", wallet => {
-            wallet.setdeptlmt(1, newAmount, { authorization: this.state.accountName + "@active" });
+            wallet.setdeptlmt(this.state.departmentId, newAmount, { authorization: this.state.accountName + "@active" });
         });
 
         this.setState({
@@ -199,7 +206,7 @@ class Dashborad extends Component {
                         <Card
                             style={{ width: '100%' }}
                             title="Recent Expenses"
-                            extra={<a href="#">See All</a>}
+                            // extra={<a href="#">See All</a>}
                             activeTabKey={this.state.key}
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}
                         >

@@ -30,7 +30,7 @@ module.exports = {
     actionAddDepartment: "newdept",
     permissionAddDepartment: "newdept",
 
-    actionToggleDepartment: "tgldept",
+    actionToggleDepartment: "toggledept",
     permissionToggleDepartment: "tgldept",
 
     actionProcessApplication: "processapp",

@@ -2,11 +2,7 @@ import React, { Component } from 'react';
 import { Card, Divider, Row, Col, Button } from 'antd';
 import Eos from "eosjs";
 
-const eos = Eos({
-    httpEndpoint: "http://127.0.0.1:8888",
-    chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
-    keyProvider: JSON.parse(sessionStorage.getItem("privateKey"))
-});
+let eos;
 
 class ExpenditureDetailPage extends Component {
 
@@ -23,6 +19,17 @@ class ExpenditureDetailPage extends Component {
             tokenName: "XXX",
             expenses: null
         };
+
+        const keys = JSON.parse(sessionStorage.getItem("privateKey"));
+        const provider = new Array();
+        for (let i = 0; i < keys.length; i++)
+            provider.push(keys[i]);
+
+        eos = Eos({
+            httpEndpoint: "http://127.0.0.1:8888",
+            chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
+            keyProvider: provider
+        });
 
         this.initPage();
     }
