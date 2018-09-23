@@ -197,6 +197,12 @@ class Dashborad extends Component {
         this.pageInit();
     }
 
+    unixToString = (unix) => {
+        let ret = new Date(unix * 1000).toISOString().replace("T", " ");
+        ret = ret.substr(0, ret.indexOf("."));
+        return ret;
+    }
+
     render() {
         return (
             <div>
@@ -251,7 +257,7 @@ class Dashborad extends Component {
                                     this.state.expenses.map((value, index) => <div>
                                         <Row gutter={16}>
                                             <Col span={8}>
-                                                <p style={{ margin: 0, color: "grey" }}>2018-08-20 16:00:00</p>
+                                                <p style={{ margin: 0, color: "grey" }}>{this.unixToString(value.time)}</p>
                                             </Col>
                                             <Col span={8}>
                                                 <p style={{ margin: 0 }}>{value.memo}</p>
