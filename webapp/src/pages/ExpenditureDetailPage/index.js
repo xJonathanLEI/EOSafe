@@ -21,6 +21,9 @@ class ExpenditureDetailPage extends Component {
             expenses: null,
             spendVisible: false,
             spendAmount: "",
+            limitVisible: false,
+            newLimit: "",
+            deleteVisible: false,
             memo: "",
             accountName: sessionStorage.getItem("acctName")
         };
@@ -118,11 +121,37 @@ class ExpenditureDetailPage extends Component {
         this.initPage();
     }
 
+    handleLimit = async () => {
+        if (this.state.newLimit.length == 0 || isNaN(this.state.newLimit))
+            return;
+
+        const newLimit = Math.round(Number.parseFloat(this.state.newLimit) * Math.pow(10, this.state.tokenPrecision));
+
+        await eos.transaction("wallet", wallet => {
+            wallet.adjexpense(this.state.departmentId, this.state.expenditureId, newLimit, { authorization: this.state.accountName + "@active" })
+        });
+
+        this.setState({ limitVisible: false });
+
+        this.initPage();
+    }
+
+    handleDelete = async () => {
+
+        await eos.transaction("wallet", wallet => {
+            wallet.rmexpense(this.state.departmentId, this.state.expenditureId, { authorization: this.state.accountName + "@active" })
+        });
+
+        this.setState({ deleteVisible: false });
+
+        this.initPage();
+    }
+
     render() {
         return (
             <div>
                 <h1>{this.state.expenditureName} Expenditure</h1>
-                <Card title="Overview" extra={<div><Button type="primary" onClick={() => { this.setState({ spendVisible: true }); }}>Spend</Button>  <Button type="default">Change Limit</Button>  <Button type="danger">Delete</Button></div>}>
+                <Card title="Overview" extra={<div><Button type="primary" onClick={() => { this.setState({ spendVisible: true }); }}>Spend</Button>  <Button type="default" onClick={() => { this.setState({ limitVisible: true }); }}>Change Limit</Button>  <Button type="danger" onClick={() => { this.setState({ deleteVisible: true }); }}>Delete</Button></div>}>
                     <Row gutter={16}>
                         <Col span={12}>
                             <p style={{ textAlign: "center" }}>Recipient:</p>
@@ -217,6 +246,45 @@ class ExpenditureDetailPage extends Component {
                             <Input placeholder="" onChange={(e) => { this.setState({ memo: e.target.value }) }} />
                         </Col>
                     </Row>
+                </Modal>
+                <Modal
+                    title="Change Expenditure Limit"
+                    visible={this.state.limitVisible}
+                    okText="Submit"
+                    onOk={this.handleLimit}
+                    onCancel={() => { this.setState({ limitVisible: false }) }}
+                >
+                    <Row gutter={16}>
+                        <Col span={10} style={{ textAlign: "center" }}>
+                            <p>Monthly Allowance:</p>
+                        </Col>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <p>{this.state.expenditureAllowance}</p>
+                        </Col>
+                        <Col span={4}>
+                            <p>{this.state.tokenName}</p>
+                        </Col>
+                    </Row>
+                    <Row gutter={16} style={{ display: "flex", alignItems: "center" }}>
+                        <Col span={10} style={{ textAlign: "center" }}>
+                            <p style={{ margin: 0 }}>New Allowance:</p>
+                        </Col>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <Input placeholder="" onChange={(e) => { this.setState({ newLimit: e.target.value }) }} />
+                        </Col>
+                        <Col span={4}>
+                            <p style={{ margin: 0 }}>{this.state.tokenName}</p>
+                        </Col>
+                    </Row>
+                </Modal>
+                <Modal
+                    title="Confirm Expenditure Deletion"
+                    visible={this.state.deleteVisible}
+                    okText="Delete"
+                    onOk={this.handleDelete}
+                    onCancel={() => { this.setState({ deleteVisible: false }) }}
+                >
+                    <p>Are you sure you want to delete the expenditure?</p>
                 </Modal>
             </div>
 
