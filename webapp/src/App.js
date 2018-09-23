@@ -41,18 +41,18 @@ class App extends Component {
                                 defaultSelectedKeys={['1']}
                                 style={{lineHeight: '64px'}}>
                                 <Menu.Item key="1" onClick={() => {
-                                    this.props.history.push("/")
+                                    this.props.history.push("/manager")
                                 }}>Dashboard</Menu.Item>
                                 <Menu.Item key="2" onClick={() => {
-                                    this.props.history.push("/expenditureDetailPage")
+                                    this.props.history.push("/manager/expenditure")
                                 }}>Expenditure Detail</Menu.Item>
                             </Menu>
                         </Header>
                         <Content style={{padding: '0 50px'}}>
                             <div style={{background: '#fff', marginTop: 24, padding: 24, minHeight: 280}}>
                                 <Switch>
-                                    <Route exact path="/" component={dashboard}/>
-                                    <Route exact path="/expenditureDetailPage" component={expenditureDetailPage}/>
+                                    <Route exact path="/manager" component={dashboard}/>
+                                    <Route exact path="/manager/expenditure" component={expenditureDetailPage}/>
                                 </Switch>
                             </div>
                         </Content>
