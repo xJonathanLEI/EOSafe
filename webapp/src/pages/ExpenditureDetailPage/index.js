@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Divider, Row, Col } from 'antd';
+import { Card, Divider, Row, Col, Button } from 'antd';
 import Eos from "eosjs";
 
 const eos = Eos({
@@ -15,7 +15,7 @@ class ExpenditureDetailPage extends Component {
 
         this.state = {
             departmentId: Number.parseInt(sessionStorage.getItem("departmentId")),
-            expenditureId: 1,
+            expenditureId: this.props.match.params.id,
             expenditureName: "-",
             expenditureRecipient: "-",
             expenditureAllowance: "-",
@@ -94,7 +94,7 @@ class ExpenditureDetailPage extends Component {
         return (
             <div>
                 <h1>{this.state.expenditureName} Expenditure</h1>
-                <Card title="Allowance" extra={<div><a onClick={this.showModal} href="#">Spend</a> | <a onClick={this.showModal} href="#">Apply to Charge</a></div>}>
+                <Card title="Overview" extra={<div><Button type="primary">Spend</Button>  <Button type="default">Change Limit</Button>  <Button type="danger">Delete</Button></div>}>
                     <Row gutter={16}>
                         <Col span={12}>
                             <p style={{ textAlign: "center" }}>Recipient:</p>

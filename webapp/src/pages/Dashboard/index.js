@@ -67,6 +67,7 @@ class Dashborad extends Component {
                 continue;
 
             displayedExpenditures.push({
+                id: currentExpenditure.id,
                 name: currentExpenditure.name,
                 used: this.formatAmount(currentExpenditure.allowance_used, token),
                 total: this.formatAmount(currentExpenditure.monthly_allowance, token),
@@ -184,7 +185,7 @@ class Dashborad extends Component {
                         <Card
                             style={{ width: '100%' }}
                             title="Expenditures"
-                            extra={<a href="#">Manage</a>}
+                            extra={<a href="#">Create New</a>}
                             activeTabKey={this.state.key}
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}
                         >
