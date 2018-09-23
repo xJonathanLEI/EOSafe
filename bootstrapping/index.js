@@ -12,6 +12,8 @@ const eos = Eos({
         config.walletKey,
         config.executorKey,
         config.cfoKey,
+        config.mktMgrKey,
+        config.hrMgrKey,
         config.executorOwner1,
         config.executorOwner2,
         config.executorOwner3
@@ -140,50 +142,61 @@ async function run() {
     await createNewAccount(eos, config.mkgMgrName, ecc.privateToPublic(config.mktMgrKey));
     await createNewAccount(eos, config.mktProgram1Name, ecc.privateToPublic(config.recipientKey));
     await createNewAccount(eos, config.mktProgram2Name, ecc.privateToPublic(config.recipientKey));
+    await createNewAccount(eos, config.hrMgrName, ecc.privateToPublic(config.hrMgrKey));
+    await createNewAccount(eos, config.hrProgram1Name, ecc.privateToPublic(config.recipientKey));
+    await createNewAccount(eos, config.hrProgram2Name, ecc.privateToPublic(config.recipientKey));
 
-    await eos.transaction(["eosio", config.walletName], contracts => {
-        contracts["eosio"].updateauth(config.executorName, config.mktPermissionName, "active", {
-            threshold: 1,
-            keys: [],
-            accounts: [{ permission: { actor: config.mkgMgrName, permission: "active" }, weight: 1 }],
-            waits: []
-        }, { authorization: config.executorName + "@active" });
-        contracts[config.walletName].newdept("Marketing", config.mktPermissionName, { authorization: config.executorName + "@" + config.permissionAddDepartment });
-        contracts["eosio"].linkauth(config.executorName, config.walletName, "setdeptlmt", config.mktPermissionName);
-        contracts["eosio"].linkauth(config.executorName, config.walletName, "addexpense", config.mktPermissionName);
-        contracts["eosio"].linkauth(config.executorName, config.walletName, "rmexpense", config.mktPermissionName);
-        contracts["eosio"].linkauth(config.executorName, config.walletName, "adjexpense", config.mktPermissionName);
-        contracts["eosio"].linkauth(config.executorName, config.walletName, "spend", config.mktPermissionName);
+    await eos.transaction(config.walletName, wallet => {
+        wallet.newdept("Marketing", config.mkgMgrName, { authorization: config.executorName + "@" + config.permissionAddDepartment });
+    });
+
+    await eos.transaction(config.walletName, wallet => {
+        wallet.newdept("Human Resource", config.hrMgrName, { authorization: config.executorName + "@" + config.permissionAddDepartment });
     });
 
     // Apply for 1000.0000 EOS allowance
 
     await eos.transaction(config.walletName, wallet => {
-        wallet.setdeptlmt(1, 10000000, { authorization: config.executorName + "@" + config.mktPermissionName });
+        wallet.setdeptlmt(1, 10000000, { authorization: config.mkgMgrName + "@active" });
+    });
+
+    await eos.transaction(config.walletName, wallet => {
+        wallet.setdeptlmt(2, 50000000, { authorization: config.hrMgrName + "@active" });
     });
 
     // Approve application
 
     await eos.transaction(config.walletName, wallet => {
         wallet.processapp(1, 1, { authorization: config.executorName + "@" + config.permissionProcessApplication });
+        wallet.processapp(2, 1, { authorization: config.executorName + "@" + config.permissionProcessApplication });
     });
 
     // Create 500.0000 EOS expenditure
 
     await eos.transaction(config.walletName, wallet => {
-        wallet.addexpense(1, "Road Show Program", config.mktProgram1Name, 5000000, { authorization: config.executorName + "@" + config.mktPermissionName });
+        wallet.addexpense(1, "Road Show Program", config.mktProgram1Name, 5000000, { authorization: config.mkgMgrName + "@active" });
+    });
+
+    await eos.transaction(config.walletName, wallet => {
+        wallet.addexpense(2, "Salary", config.hrProgram1Name, 10000000, { authorization: config.hrMgrName + "@active" });
     });
 
     // Spend 100.0000 EOS
 
     await eos.transaction(config.walletName, wallet => {
-        wallet.spend(1, 1, 1000000, "Rental for roadshow", { authorization: config.executorName + "@" + config.mktPermissionName });
+        wallet.spend(1, 1, 1000000, "Rental for roadshow", { authorization: config.mkgMgrName + "@active" });
     });
 
     // Spend 200.0000 EOS
 
     await eos.transaction(config.walletName, wallet => {
-        wallet.spend(1, 1, 2000000, "Roadshow refreshment", { authorization: config.executorName + "@" + config.mktPermissionName });
+        wallet.spend(1, 1, 2000000, "Roadshow refreshment", { authorization: config.mkgMgrName + "@active" });
+    });
+
+    // Spend 300.0000 EOS
+
+    await eos.transaction(config.walletName, wallet => {
+        wallet.spend(2, 1, 3000000, "Community manager salary", { authorization: config.hrMgrName + "@active" });
     });
 
     console.log("System ready for demo!");
