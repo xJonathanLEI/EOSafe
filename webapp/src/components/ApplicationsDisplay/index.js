@@ -14,7 +14,7 @@ class ApplicationsDisplay extends Component {
                                     <p><strong>{value.departmentName} Department</strong></p>
                                 </Col>
                                 <Col span={14} style={{ textAlign: "right" }}>
-                                    <Button type="primary">Approve</Button> <Button type="dashed">Reject</Button>
+                                    <Button onClick={() => { this.props.onApprove(value.id) }} type="primary">Approve</Button> <Button onClick={() => { this.props.onReject(value.id) }} type="dashed">Reject</Button>
                                 </Col>
                             </Row>
                             <Row gutter={16} style={{ paddingTop: 8 }}>

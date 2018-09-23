@@ -66,7 +66,7 @@ class CFODashboard extends Component {
                 continue;
 
             displayedApplications.push({
-                id: currentApplication.id,
+                id: currentApplication.application_id,
                 departmentId: currentApplication.department_id,
                 from: this.formatAmount(currentApplication.from_allowance, token),
                 to: this.formatAmount(currentApplication.to_allowance, token),
@@ -106,6 +106,22 @@ class CFODashboard extends Component {
         }
 
         return { name: symbolName, precision: tokenPrecision };
+    }
+
+    handleApprove = async (id) => {
+        await eos.transaction("wallet", wallet => {
+            wallet.processapp(id, 1, { authorization: "executor@processapp" });
+        });
+
+        this.pageInit();
+    }
+
+    handleRejct = async (id) => {
+        await eos.transaction("wallet", wallet => {
+            wallet.processapp(id, 0, { authorization: "executor@processapp" });
+        });
+
+        this.pageInit();
     }
 
     showModal = () => {
@@ -182,7 +198,7 @@ class CFODashboard extends Component {
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}
                         >
                             {
-                                this.state.applications ? <ApplicationsDisplay applications={this.state.applications} /> : null
+                                this.state.applications ? <ApplicationsDisplay onApprove={this.handleApprove} onReject={this.handleRejct} applications={this.state.applications} /> : null
                             }
                         </Card>
                     </Col>
