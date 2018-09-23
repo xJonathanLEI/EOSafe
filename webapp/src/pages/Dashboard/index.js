@@ -2,20 +2,23 @@ import React, { Component } from 'react';
 import { withRouter } from "react-router-dom";
 import { Card, Col, Row, Divider, Modal, Input } from 'antd';
 import Eos from "eosjs";
+import ecc from "eosjs-ecc";
 
 import ExpenditureDisplay from "../../components/ExpenditureDisplay";
 
 const eos = Eos({
     httpEndpoint: "http://127.0.0.1:8888",
     chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
-    keyProvider: "5Hy6fgqpDaczdH82wMK3BTKf7aktg3vj9qFdem35FL1bBykYro4"
+    keyProvider: JSON.parse(sessionStorage.getItem("privateKey"))
 });
 
 class Dashborad extends Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
+            departmentId: Number.parseInt(sessionStorage.getItem("departmentId")),
             changeAllowanceModal: false,
             departmentName: "-",
             monthlyAllowance: "-",
@@ -30,13 +33,25 @@ class Dashborad extends Component {
             deptPerm: ""
         };
 
+        if (!sessionStorage.getItem("privateKey")) {
+            this.props.history.push("/");
+            return;
+        }
+
         this.pageInit();
     }
 
     pageInit = async () => {
 
         const configs = (await eos.getTableRows(true, "wallet", "wallet", "configs")).rows[0];
-        const department = (await eos.getTableRows(true, "wallet", "wallet", "departments")).rows[0];
+        const departments = (await eos.getTableRows(true, "wallet", "wallet", "departments")).rows;
+        let department;
+        for (let i = 0; i < departments.length; i++) {
+            if (departments[i].id == this.state.departmentId) {
+                department = departments[i];
+                break;
+            }
+        }
         const expenditures = (await eos.getTableRows(true, "wallet", department.id, "expenditures")).rows;
         const expenses = (await eos.getTableRows(true, "wallet", "wallet", "expenses")).rows;
 
@@ -194,7 +209,7 @@ class Dashborad extends Component {
                                                 <p style={{ margin: 0, color: "grey" }}>2018-08-20 16:00:00</p>
                                             </Col>
                                             <Col span={8}>
-                                                <p style={{ margin: 0 }}>{value.name}</p>
+                                                <p style={{ margin: 0 }}>{value.memo}</p>
                                             </Col>
                                             <Col span={8}>
                                                 <p style={{ margin: 0, fontWeight: "bold", textAlign: "right" }}>- {value.amount} {this.state.tokenName}</p>

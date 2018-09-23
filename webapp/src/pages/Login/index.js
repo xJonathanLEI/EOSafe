@@ -6,14 +6,19 @@ import "./index.css";
 class Login extends Component {
 
     handleHrLogin = () => {
+        sessionStorage.setItem("departmentId", "2");
+        sessionStorage.setItem("privateKey", "[\"5JaekDL3XeCt3MjXvpUiRr1mowRVjCitXi4WKRKK5uDDPM4GN1d\"]");
         this.props.history.push("/manager");
     }
 
     handleMktLogin = () => {
+        sessionStorage.setItem("departmentId", "1");
+        sessionStorage.setItem("privateKey", "[\"5JzTMCC7u5eFvy1rBjQBkKjpkRNF5V9d3aTuUk6pXkB6bEGYvv5\"]");
         this.props.history.push("/manager");
     }
 
     handleCfoLogin = () => {
+        sessionStorage.setItem("privateKey", "5Hy6fgqpDaczdH82wMK3BTKf7aktg3vj9qFdem35FL1bBykYro4");
         this.props.history.push("/cfo");
     }
 
