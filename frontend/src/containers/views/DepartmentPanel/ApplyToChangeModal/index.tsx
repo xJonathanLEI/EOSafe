@@ -11,15 +11,13 @@ const FormItem = Form.Item
 const formItemLayout = {
     labelCol: {
         xs: { span: 24 },
-        sm: { span: 5 }
+        sm: { span: 9 }
     },
     wrapperCol: {
         xs: { span: 24 },
-        sm: { span: 19 }
+        sm: { span: 12 }
     }
 }
-
-const userCategory = ['user', 'admin']
 
 interface IStoreProps {
     createUser?: (user: IUserStore.IUser) => Promise<any>
@@ -41,7 +39,7 @@ interface IProps extends IStoreProps {
     }
 )
 @observer
-class UserModal extends ComponentExt<IProps & FormComponentProps> {
+class ApplyToChangeModal extends ComponentExt<IProps & FormComponentProps> {
     @observable
     private loading: boolean = false
 
@@ -52,7 +50,7 @@ class UserModal extends ComponentExt<IProps & FormComponentProps> {
 
     @computed
     get title() {
-        return this.typeIsAdd ? 'Add User' : 'Modify User'
+        return "Apply to Change"
     }
 
     @action
@@ -86,16 +84,25 @@ class UserModal extends ComponentExt<IProps & FormComponentProps> {
     }
 
     render() {
-        const { visible, onCancel, user, form } = this.props
+        const { visible, onCancel, form } = this.props
         const { getFieldDecorator } = form
-        const initialAccount = user ? user.account : ''
-        const initialCategory = user ? user.category : userCategory[0]
+        // const initialAccount = user ? user.account : ''
+        // const initialCategory = user ? user.category : userCategory[0]
         return (
             <Modal title={this.title} visible={visible} onOk={this.submit} onCancel={onCancel}>
                 <Form onSubmit={this.submit}>
-                    <FormItem {...formItemLayout} label="account">
-                        {getFieldDecorator('account', {
-                            initialValue: initialAccount,
+                    <FormItem {...formItemLayout} label="Current Allowance:">
+                        <span className="ant-form-text">1000.0000 EOS</span>
+                    </FormItem>
+                    <FormItem {...formItemLayout} label="Allocated Allowance:">
+                        <span className="ant-form-text">500.0000 EOS</span>
+                    </FormItem>
+                    <FormItem {...formItemLayout} label="Allocated Used:">
+                        <span className="ant-form-text">400.0000 EOS</span>
+                    </FormItem>
+                    <FormItem {...formItemLayout} label="New Allowance:">
+                        {getFieldDecorator('new_allowance', {
+                            initialValue: "1000.0000 EOS",
                             rules: [
                                 {
                                     required: true
@@ -103,39 +110,11 @@ class UserModal extends ComponentExt<IProps & FormComponentProps> {
                             ]
                         })(<Input />)}
                     </FormItem>
-                    {this.typeIsAdd && (
-                        <FormItem {...formItemLayout} label="password">
-                            {getFieldDecorator('password', {
-                                rules: [
-                                    {
-                                        required: true
-                                    }
-                                ]
-                            })(<Input />)}
-                        </FormItem>
-                    )}
-                    <FormItem {...formItemLayout} label="category">
-                        {getFieldDecorator('category', {
-                            initialValue: initialCategory,
-                            rules: [
-                                {
-                                    required: true
-                                }
-                            ]
-                        })(
-                            <Select>
-                                {userCategory.map(c => (
-                                    <Select.Option key={c} value={c}>
-                                        {c}
-                                    </Select.Option>
-                                ))}
-                            </Select>
-                        )}
-                    </FormItem>
+
                 </Form>
             </Modal>
         )
     }
 }
 
-export default Form.create<IProps>()(UserModal)
+export default Form.create<IProps>()(ApplyToChangeModal)

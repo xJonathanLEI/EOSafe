@@ -6,7 +6,7 @@ import { inject, observer } from 'mobx-react'
 import { toJS, observable, action } from 'mobx'
 
 import { ComponentExt } from '@utils/reactExt'
-import UserModal from './../UserModal'
+import ApplyToChangeModal from '../ApplyToChangeModal'
 
 interface IStoreProps {
     getUsersloading?: boolean
@@ -135,7 +135,7 @@ class ExpenditureComponent extends ComponentExt<IProps> {
                     }}
                     onChange={handleTableChange}
                 />
-                <UserModal
+                <ApplyToChangeModal
                     visible={this.userModalVisible}
                     onCancel={this.hideUserModalVisible}
                     user={this.currentUser}
