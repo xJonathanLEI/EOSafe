@@ -93,11 +93,21 @@ class CFODashboard extends Component {
             departments: displayedDepartments,
             applications: displayedApplications,
             sysLmt: this.scaleAmount(configs.system_monthly_limit, token.precision),
-            sysUsed: this.scaleAmount(configs.system_limit_used, token.precision),
+            sysUsed: this.scaleAmount(this.actualUsed(configs.system_limit_used, configs.last_spend_time), token.precision),
             tokenName: token.name,
             tokenPrecision: token.precision,
             tokenContract: configs.token.contract
         });
+    }
+
+    actualUsed = (used, usedTime) => {
+        let spendDate = new Date(usedTime * 1000);
+        let nowDate = new Date();
+
+        if (spendDate.getUTCFullYear() == nowDate.getFullYear() && spendDate.getUTCMonth() == nowDate.getUTCMonth())
+            return used;
+
+        return 0;
     }
 
     formatAmount = (amount, token) => {
@@ -214,7 +224,7 @@ class CFODashboard extends Component {
         this.setState({
             newDepartmentModalVisibility: false,
         });
-        
+
         this.pageInit();
     }
 

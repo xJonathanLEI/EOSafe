@@ -83,9 +83,9 @@ class Dashborad extends Component {
             displayedExpenditures.push({
                 id: currentExpenditure.id,
                 name: currentExpenditure.name,
-                used: this.formatAmount(currentExpenditure.allowance_used, token),
+                used: this.formatAmount(this.actualUsed(currentExpenditure.allowance_used, currentExpenditure.last_spend_time), token),
                 total: this.formatAmount(currentExpenditure.monthly_allowance, token),
-                percent: Math.round(currentExpenditure.allowance_used / currentExpenditure.monthly_allowance * 100)
+                percent: Math.round(this.actualUsed(currentExpenditure.allowance_used, currentExpenditure.last_spend_time) / currentExpenditure.monthly_allowance * 100)
             });
         }
 
@@ -105,7 +105,7 @@ class Dashborad extends Component {
         this.setState({
             departmentName: department.name,
             monthlyAllowance: this.scaleAmount(department.monthly_allowance, token.precision),
-            allowanceUsed: this.scaleAmount(department.allowance_used, token.precision),
+            allowanceUsed: this.scaleAmount(this.actualUsed(department.allowance_used, department.last_spend_time), token.precision),
             allowanceAllocated: this.scaleAmount(department.allowance_allocated, token.precision),
             expenditures: displayedExpenditures,
             expenses: displayedExpenses,
@@ -114,6 +114,16 @@ class Dashborad extends Component {
             tokenContract: configs.token.contract,
             deptPerm: department.permission
         });
+    }
+
+    actualUsed = (used, usedTime) => {
+        let spendDate = new Date(usedTime * 1000);
+        let nowDate = new Date();
+
+        if (spendDate.getUTCFullYear() == nowDate.getFullYear() && spendDate.getUTCMonth() == nowDate.getUTCMonth())
+            return used;
+
+        return 0;
     }
 
     formatAmount = (amount, token) => {

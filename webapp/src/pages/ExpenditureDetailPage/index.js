@@ -77,12 +77,22 @@ class ExpenditureDetailPage extends Component {
             expenditureName: expenditure.name,
             expenditureRecipient: expenditure.recipient,
             expenditureAllowance: this.scaleAmount(expenditure.monthly_allowance, token.precision),
-            expenditureUsed: this.scaleAmount(expenditure.allowance_used, token.precision),
-            expenditureAllowanceLeft: this.scaleAmount(expenditure.monthly_allowance - expenditure.allowance_used, token.precision),
+            expenditureUsed: this.scaleAmount(this.actualUsed(expenditure.allowance_used, expenditure.last_spend_time), token.precision),
+            expenditureAllowanceLeft: this.scaleAmount(expenditure.monthly_allowance - this.actualUsed(expenditure.allowance_used, expenditure.last_spend_time), token.precision),
             tokenName: token.name,
             tokenPrecision: token.precision,
             expenses: displayedExpenses
         });
+    }
+
+    actualUsed = (used, usedTime) => {
+        let spendDate = new Date(usedTime * 1000);
+        let nowDate = new Date();
+
+        if (spendDate.getUTCFullYear() == nowDate.getFullYear() && spendDate.getUTCMonth() == nowDate.getUTCMonth())
+            return used;
+
+        return 0;
     }
 
     formatAmount = (amount, token) => {
