@@ -16,6 +16,10 @@ class Dashborad extends Component {
         this.state = {
             departmentId: Number.parseInt(sessionStorage.getItem("departmentId")),
             changeAllowanceModal: false,
+            newExpenseVisible: false,
+            newName: "",
+            recipient: "",
+            expenseAllownance: "",
             departmentName: "-",
             monthlyAllowance: "-",
             allowanceUsed: "-",
@@ -153,12 +157,26 @@ class Dashborad extends Component {
         this.setState({
             changeAllowanceModal: false,
         });
+
+        this.pageInit();
     }
 
-    handleCancel = (e) => {
-        this.setState({
-            changeAllowanceModal: false,
+    handleNewExpense = async () => {
+
+        if (this.state.expenseAllownance.length == 0 || isNaN(this.state.expenseAllownance))
+            return;
+
+        const expenseAllownance = Math.round(Number.parseFloat(this.state.expenseAllownance) * Math.pow(10, this.state.tokenPrecision));
+
+        await eos.transaction("wallet", wallet => {
+            wallet.addexpense(this.state.departmentId, this.state.newName, this.state.recipient, expenseAllownance, { authorization: this.state.accountName + "@active" });
         });
+
+        this.setState({
+            newExpenseVisible: false,
+        });
+
+        this.pageInit();
     }
 
     render() {
@@ -193,7 +211,7 @@ class Dashborad extends Component {
                         <Card
                             style={{ width: '100%' }}
                             title="Expenditures"
-                            extra={<a href="#">Create New</a>}
+                            extra={<a onClick={() => { this.setState({ newExpenseVisible: true }); }}>Create New</a>}
                             activeTabKey={this.state.key}
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}
                         >
@@ -236,7 +254,7 @@ class Dashborad extends Component {
                     visible={this.state.changeAllowanceModal}
                     okText="Submit"
                     onOk={this.handleOk}
-                    onCancel={this.handleCancel}
+                    onCancel={() => { this.setState({ changeAllowanceModal: false }); }}
                 >
                     <Row gutter={16}>
                         <Col span={10} style={{ textAlign: "center" }}>
@@ -277,6 +295,41 @@ class Dashborad extends Component {
                         </Col>
                         <Col span={10} style={{ textAlign: "right" }}>
                             <Input placeholder="" onChange={(e) => { this.setState({ newAllowance: e.target.value }) }} />
+                        </Col>
+                        <Col span={4}>
+                            <p style={{ margin: 0 }}>{this.state.tokenName}</p>
+                        </Col>
+                    </Row>
+                </Modal>
+                <Modal
+                    title="New Expenditure Item"
+                    visible={this.state.newExpenseVisible}
+                    okText="Submit"
+                    onOk={this.handleNewExpense}
+                    onCancel={() => { this.setState({ newExpenseVisible: false }); }}
+                >
+                    <Row gutter={16} style={{ display: "flex", alignItems: "center" }}>
+                        <Col span={10} style={{ textAlign: "center" }}>
+                            <p style={{ margin: 0 }}>Name:</p>
+                        </Col>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <Input placeholder="" onChange={(e) => { this.setState({ newName: e.target.value }) }} />
+                        </Col>
+                    </Row>
+                    <Row gutter={16} style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
+                        <Col span={10} style={{ textAlign: "center" }}>
+                            <p style={{ margin: 0 }}>Recipient:</p>
+                        </Col>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <Input placeholder="" onChange={(e) => { this.setState({ recipient: e.target.value }) }} />
+                        </Col>
+                    </Row>
+                    <Row gutter={16} style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
+                        <Col span={10} style={{ textAlign: "center" }}>
+                            <p style={{ margin: 0 }}>Monthly Allowance:</p>
+                        </Col>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <Input placeholder="" onChange={(e) => { this.setState({ expenseAllownance: e.target.value }) }} />
                         </Col>
                         <Col span={4}>
                             <p style={{ margin: 0 }}>{this.state.tokenName}</p>
