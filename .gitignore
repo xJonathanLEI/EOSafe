@@ -23,5 +23,9 @@ bootstrapping/node_modules
 /webapp/yarn-debug.log*
 /webapp/yarn-error.log*
 /webapp/yarn.lock
-/webapp/.idea
 
+# IDEA files
+**/.idea
+
+# yarn lock ignored when using npm build.
+**/yarn.lock
