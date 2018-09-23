@@ -15,6 +15,8 @@ class CFODashboard extends Component {
 
         this.state = {
             newDepartmentModalVisibility: false,
+            deptName: "",
+            deptMgr: "",
             walletBalance: "- XXX",
             sysLmt: "-",
             sysUsed: "-",
@@ -194,16 +196,11 @@ class CFODashboard extends Component {
         });
     }
 
-    handleOk = async (e) => {
-
-        if (this.state.newAllowance.length == 0 || isNaN(this.state.newAllowance))
-            return;
-
-        const newAmount = Math.round(Number.parseFloat(this.state.newAllowance) * Math.pow(10, this.state.tokenPrecision));
+    handleNewDept = async (e) => {
 
         try {
             await eos.transaction("wallet", wallet => {
-                wallet.setdeptlmt(1, newAmount, { authorization: "executor@" + this.state.deptPerm });
+                wallet.newdept(this.state.deptName, this.state.deptMgr, { authorization: "executor@newdept" });
             });
         }
         catch (ex) {
@@ -216,12 +213,8 @@ class CFODashboard extends Component {
         this.setState({
             newDepartmentModalVisibility: false,
         });
-    }
-
-    handleCancel = (e) => {
-        this.setState({
-            newDepartmentModalVisibility: false,
-        });
+        
+        this.pageInit();
     }
 
     render() {
@@ -262,7 +255,7 @@ class CFODashboard extends Component {
                         <Card
                             style={{ width: '100%' }}
                             title="Departments"
-                            extra={<a>New Department</a>}//TODO onClick show modal
+                            extra={<a onClick={() => { this.setState({ newDepartmentModalVisibility: true }); }}>New Department</a>}
                             activeTabKey={this.state.key}
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}>
                             {
@@ -288,53 +281,32 @@ class CFODashboard extends Component {
                     title="New Department"
                     visible={this.state.newDepartmentModalVisibility}
                     okText="Submit"
-                    onOk={this.handleOk}
-                    onCancel={this.handleCancel}
+                    onOk={this.handleNewDept}
+                    onCancel={() => { this.setState({ newDepartmentModalVisibility: false }); }}
                 >
-                    <Row gutter={16}>
-                        <Col span={10} style={{ textAlign: "center" }}>
-                            <p>Current Allowance:</p>
-                        </Col>
-                        <Col span={10} style={{ textAlign: "right" }}>
-                            <p>{this.state.monthlyAllowance}</p>
-                        </Col>
-                        <Col span={4}>
-                            <p>{this.state.tokenName}</p>
-                        </Col>
-                    </Row>
-                    <Row gutter={16}>
-                        <Col span={10} style={{ textAlign: "center" }}>
-                            <p>Allocated Allowance:</p>
-                        </Col>
-                        <Col span={10} style={{ textAlign: "right" }}>
-                            <p>{this.state.allowanceAllocated}</p>
-                        </Col>
-                        <Col span={4}>
-                            <p>{this.state.tokenName}</p>
-                        </Col>
-                    </Row>
-                    <Row gutter={16}>
-                        <Col span={10} style={{ textAlign: "center" }}>
-                            <p>Allowance Used:</p>
-                        </Col>
-                        <Col span={10} style={{ textAlign: "right" }}>
-                            <p>{this.state.allowanceUsed}</p>
-                        </Col>
-                        <Col span={4}>
-                            <p>{this.state.tokenName}</p>
-                        </Col>
-                    </Row>
                     <Row gutter={16} style={{ display: "flex", alignItems: "center" }}>
                         <Col span={10} style={{ textAlign: "center" }}>
-                            <p style={{ margin: 0 }}>New Allowance:</p>
+                            <p style={{ margin: 0 }}>Name:</p>
                         </Col>
                         <Col span={10} style={{ textAlign: "right" }}>
-                            <Input placeholder="" onChange={(e) => { this.setState({ newAllowance: e.target.value }) }} />
-                        </Col>
-                        <Col span={4}>
-                            <p style={{ margin: 0 }}>{this.state.tokenName}</p>
+                            <Input placeholder="" onChange={(e) => { this.setState({ deptName: e.target.value }) }} />
                         </Col>
                     </Row>
+                    <Row gutter={16} style={{ display: "flex", alignItems: "center", paddingTop: 8 }}>
+                        <Col span={10} style={{ textAlign: "center" }}>
+                            <p style={{ margin: 0 }}>Manager:</p>
+                        </Col>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <Input placeholder="" onChange={(e) => { this.setState({ deptMgr: e.target.value }) }} />
+                        </Col>
+                    </Row>
+                    <p style={{
+                        marginTop: 14,
+                        marginBottom: 0,
+                        color: "grey",
+                        fontStyle: "italic",
+                        textAlign: "center"
+                    }}>Newly created departments always have <strong>0</strong> initial allowance.</p>
                 </Modal>
                 <Modal
                     title="Operation Failed"
