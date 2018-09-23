@@ -4,25 +4,25 @@ import { observable, action } from 'mobx'
 import { Button } from 'antd'
 
 import * as styles from './index.scss'
-import UserModal from './../UserModal'
+import ApplyToChangeModal from '../ApplyToChangeModal'
 
 @observer
 class Header extends React.Component {
     @observable
-    private userModalVisible: boolean = false
+    private applyToChangeModalVisible: boolean = false
 
     @action
-    toggleUserModalVisible = () => {
-        this.userModalVisible = !this.userModalVisible
+    toggleApplyToChangeModalVisible = () => {
+        this.applyToChangeModalVisible = !this.applyToChangeModalVisible
     }
 
     render() {
         return (
             <div className={styles.header}>
-                <Button type="primary" onClick={this.toggleUserModalVisible}>
+                <Button type="primary" onClick={this.toggleApplyToChangeModalVisible}>
                     add user
                 </Button>
-                <UserModal visible={this.userModalVisible} onCancel={this.toggleUserModalVisible} />
+                <ApplyToChangeModal visible={this.applyToChangeModalVisible} onCancel={this.toggleApplyToChangeModalVisible} />
             </div>
         )
     }

@@ -3,11 +3,11 @@ import {observer} from 'mobx-react'
 import {action, observable} from 'mobx'
 
 import * as styles from './index.scss'
-import Header from './Header'
 import ExpenditureComponent from "@views/DepartmentPanel/ExpenditureComponent";
 import RGL, {WidthProvider} from "react-grid-layout";
 import {Card, Form} from "antd";
 import FormItem from "antd/lib/form/FormItem";
+import ApplyToChangeModal from "@views/DepartmentPanel/ApplyToChangeModal";
 
 const ReactGridLayout = WidthProvider(RGL);
 
@@ -17,6 +17,19 @@ class DepartmentPanel extends React.Component {
     private tableScrollY: number = 0
 
     private containerRef: HTMLDivElement = null
+
+    @observable
+    private applyToChangeModalVisible: boolean = false
+
+    @action
+    toggleApplyToChangeModalVisible = () => {
+        this.applyToChangeModalVisible = !this.applyToChangeModalVisible
+    }
+
+    onClickApply = (e) => {
+        e.preventDefault()
+        this.toggleApplyToChangeModalVisible()
+    }
 
     @action
     setTableScrollY = () => {
@@ -48,18 +61,20 @@ class DepartmentPanel extends React.Component {
             labelCol: { span: 6 },
             wrapperCol: { span: 14 },
         };
+
         return (
             <div className={styles.container}>
                 <h3>Department Name: HR</h3>
                 <div key='a' data-grid={{x: 0, y: 0, h: 3, w: 2}}>
-                    <Header/>
+                    {/*<Header/>*/}
                     <div className={styles.tableBox} ref={this.setTableScrollY}>
                         <ExpenditureComponent scrollY={this.tableScrollY}/>
                     </div>
                 </div>
+                <ApplyToChangeModal visible={this.applyToChangeModalVisible} onCancel={this.toggleApplyToChangeModalVisible} />
                 <ReactGridLayout cols={2}>
                     <Card key='allowance' data-grid={{x: 0, y: 0, h: 2, w: 2}}
-                    title="Allowance" extra={<a href="#">Apply to Charge</a>}>
+                    title="Allowance" extra={<a onClick={this.onClickApply} href="">Apply to Charge</a>}>
 
                         <Form>
                             <FormItem label="Monthly Allowance:"  {...formItemLayout}>

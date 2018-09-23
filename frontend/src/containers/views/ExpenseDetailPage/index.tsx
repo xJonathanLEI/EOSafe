@@ -123,5 +123,5 @@ class ExpenseDetailPage extends ComponentExt<IProps & FormComponentProps> {
 }
 
 export default Form.create<IProps>()(ExpenseDetailPage)
-// export default Form.create<IProps>()(UserModal)
+// export default Form.create<IProps>()(ApplyToChangeModal)
 // export default Form.create<{}>()(Login)
