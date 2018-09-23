@@ -7,14 +7,14 @@ import {
 import { Layout, Menu } from 'antd';
 import './App.css';
 
-import dashborad from "./pages/Dashboard";
-
+import dashboard from "./pages/Dashboard";
+import placeholderBoard from "./pages/PlaceholderBoard"
 const { Header, Content, Footer } = Layout;
 
 class App extends Component {
 
     state = {
-        current: 'dashboard',
+        current: 'Dashborad',
     }
 
     handleClick = (e) => {
@@ -35,13 +35,15 @@ class App extends Component {
                             mode="horizontal"
                             defaultSelectedKeys={['1']}
                             style={{ lineHeight: '64px' }}>
-                            <Menu.Item key="1">Dashboard</Menu.Item>
+                            <Menu.Item key="1" onClick={()=>window.location="/"}>Dashboard</Menu.Item>
+                            <Menu.Item key="2" onClick={()=>window.location="/placeholder"}>Placeholder</Menu.Item>
                         </Menu>
                     </Header>
                     <Content style={{ padding: '0 50px' }}>
                         <div style={{ background: '#fff', marginTop: 24, padding: 24, minHeight: 280 }}>
                             <Switch>
-                                <Route exact path="/" component={dashborad} />
+                                <Route exact path="/" component={dashboard} />
+                                <Route exact path="/placeholder" component={placeholderBoard} />
                             </Switch>
                         </div>
                     </Content>
