@@ -1,18 +1,18 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
     BrowserRouter as Router,
     Route,
     Switch,
     withRouter
 } from 'react-router-dom'
-import { Layout, Menu } from 'antd';
+import {Layout, Menu} from 'antd';
 import './App.css';
 
 import login from "./pages/Login";
 import dashboard from "./pages/Dashboard";
-import placeholderBoard from "./pages/PlaceholderBoard";
+import expenditureDetailPage from "./pages/ExpenditureDetailPage"
 
-const { Header, Content, Footer } = Layout;
+const {Header, Content, Footer} = Layout;
 
 class App extends Component {
 
@@ -30,38 +30,41 @@ class App extends Component {
     render() {
         return (
             <Switch>
-                <Route exact path="/" component={login} />
+                <Route exact path="/" component={login}/>
                 <Route exact>
                     <Layout className="layout">
                         <Header>
-                            <div className="logo" />
+                            <div className="logo"/>
                             <Menu
                                 theme="dark"
                                 mode="horizontal"
                                 defaultSelectedKeys={['1']}
-                                style={{ lineHeight: '64px' }}>
-                                <Menu.Item key="1" onClick={() => { this.props.history.push("/") }}>Dashboard</Menu.Item>
-                                <Menu.Item key="2" onClick={() => { this.props.history.push("/placeholder") }}>Placeholder</Menu.Item>
+                                style={{lineHeight: '64px'}}>
+                                <Menu.Item key="1" onClick={() => {
+                                    this.props.history.push("/")
+                                }}>Dashboard</Menu.Item>
+                                <Menu.Item key="2" onClick={() => {
+                                    this.props.history.push("/expenditureDetailPage")
+                                }}>Expenditure Detail</Menu.Item>
                             </Menu>
                         </Header>
-                        <Content style={{ padding: '0 50px' }}>
-                            <div style={{ background: '#fff', marginTop: 24, padding: 24, minHeight: 280 }}>
+                        <Content style={{padding: '0 50px'}}>
+                            <div style={{background: '#fff', marginTop: 24, padding: 24, minHeight: 280}}>
                                 <Switch>
-                                    <Route exact path="/manager/" component={dashboard} />
-                                    <Route exact path="/manager/placeholder" component={placeholderBoard} />
+                                    <Route exact path="/" component={dashboard}/>
+                                    <Route exact path="/expenditureDetailPage" component={expenditureDetailPage}/>
                                 </Switch>
                             </div>
                         </Content>
-                        <Footer style={{ textAlign: 'center' }}>
+                        <Footer style={{textAlign: 'center'}}>
                             Created by EOSafe
-                    </Footer>
+                        </Footer>
                     </Layout>
                 </Route>
             </Switch>
         );
     }
 }
-
 
 
 export default withRouter(App);

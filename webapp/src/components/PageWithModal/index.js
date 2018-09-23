@@ -6,9 +6,11 @@ import ExpenditureDisplay from "../../components/ExpenditureDisplay";
 class PageWithModal extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            changeAllowanceModal: false
-        };
+        this.state = ( {
+            changeAllowanceModal: false,
+            title: "Page",
+            modalTitle: "Modal Title"
+        });
     }
 
     showModal = () => {
@@ -33,7 +35,7 @@ class PageWithModal extends Component {
 
     getModal() {
         return (<Modal
-            title={this.props.modalTitle}
+            title={this.state.modalTitle}
             visible={this.state.changeAllowanceModal}
             okText="Submit"
             onOk={this.handleOk}
@@ -49,7 +51,7 @@ class PageWithModal extends Component {
     render() {
         return (
             <div>
-                <h1>{this.props.title}</h1>
+                <h1>{this.state.title}</h1>
                 {this.getModal()}
                 {this.getPageContainer()}
             </div>
