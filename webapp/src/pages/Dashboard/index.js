@@ -31,7 +31,9 @@ class Dashborad extends Component {
             tokenContract: "",
             newAllowance: "",
             deptPerm: "",
-            accountName: sessionStorage.getItem("acctName")
+            accountName: sessionStorage.getItem("acctName"),
+            errorVisible: false,
+            errorMsg: ""
         };
 
         if (!sessionStorage.getItem("privateKey")) {
@@ -150,9 +152,17 @@ class Dashborad extends Component {
 
         const newAmount = Math.round(Number.parseFloat(this.state.newAllowance) * Math.pow(10, this.state.tokenPrecision));
 
-        await eos.transaction("wallet", wallet => {
-            wallet.setdeptlmt(this.state.departmentId, newAmount, { authorization: this.state.accountName + "@active" });
-        });
+        try {
+            await eos.transaction("wallet", wallet => {
+                wallet.setdeptlmt(this.state.departmentId, newAmount, { authorization: this.state.accountName + "@active" });
+            });
+        }
+        catch (ex) {
+            this.setState({
+                errorVisible: true,
+                errorMsg: ex.toString()
+            });
+        }
 
         this.setState({
             changeAllowanceModal: false,
@@ -168,9 +178,17 @@ class Dashborad extends Component {
 
         const expenseAllownance = Math.round(Number.parseFloat(this.state.expenseAllownance) * Math.pow(10, this.state.tokenPrecision));
 
-        await eos.transaction("wallet", wallet => {
-            wallet.addexpense(this.state.departmentId, this.state.newName, this.state.recipient, expenseAllownance, { authorization: this.state.accountName + "@active" });
-        });
+        try {
+            await eos.transaction("wallet", wallet => {
+                wallet.addexpense(this.state.departmentId, this.state.newName, this.state.recipient, expenseAllownance, { authorization: this.state.accountName + "@active" });
+            });
+        }
+        catch (ex) {
+            this.setState({
+                errorVisible: true,
+                errorMsg: ex.toString()
+            });
+        }
 
         this.setState({
             newExpenseVisible: false,
@@ -335,6 +353,15 @@ class Dashborad extends Component {
                             <p style={{ margin: 0 }}>{this.state.tokenName}</p>
                         </Col>
                     </Row>
+                </Modal>
+                <Modal
+                    title="Operation Failed"
+                    visible={this.state.errorVisible}
+                    okText="OK"
+                    onOk={() => { this.setState({ errorVisible: false }) }}
+                    onCancel={() => { this.setState({ errorVisible: false }) }}
+                >
+                    <p>{this.state.errorMsg}</p>
                 </Modal>
             </div>
         );

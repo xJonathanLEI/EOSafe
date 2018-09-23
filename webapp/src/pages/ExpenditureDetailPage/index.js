@@ -25,7 +25,9 @@ class ExpenditureDetailPage extends Component {
             newLimit: "",
             deleteVisible: false,
             memo: "",
-            accountName: sessionStorage.getItem("acctName")
+            accountName: sessionStorage.getItem("acctName"),
+            errorVisible: false,
+            errorMsg: ""
         };
 
         const keys = JSON.parse(sessionStorage.getItem("privateKey"));
@@ -112,9 +114,17 @@ class ExpenditureDetailPage extends Component {
 
         const spendAmount = Math.round(Number.parseFloat(this.state.spendAmount) * Math.pow(10, this.state.tokenPrecision));
 
-        await eos.transaction("wallet", wallet => {
-            wallet.spend(this.state.departmentId, this.state.expenditureId, spendAmount, this.state.memo, { authorization: this.state.accountName + "@active" })
-        });
+        try {
+            await eos.transaction("wallet", wallet => {
+                wallet.spend(this.state.departmentId, this.state.expenditureId, spendAmount, this.state.memo, { authorization: this.state.accountName + "@active" })
+            });
+        }
+        catch (ex) {
+            this.setState({
+                errorVisible: true,
+                errorMsg: ex.toString()
+            });
+        }
 
         this.setState({ spendVisible: false });
 
@@ -127,9 +137,17 @@ class ExpenditureDetailPage extends Component {
 
         const newLimit = Math.round(Number.parseFloat(this.state.newLimit) * Math.pow(10, this.state.tokenPrecision));
 
-        await eos.transaction("wallet", wallet => {
-            wallet.adjexpense(this.state.departmentId, this.state.expenditureId, newLimit, { authorization: this.state.accountName + "@active" })
-        });
+        try {
+            await eos.transaction("wallet", wallet => {
+                wallet.adjexpense(this.state.departmentId, this.state.expenditureId, newLimit, { authorization: this.state.accountName + "@active" })
+            });
+        }
+        catch (ex) {
+            this.setState({
+                errorVisible: true,
+                errorMsg: ex.toString()
+            });
+        }
 
         this.setState({ limitVisible: false });
 
@@ -138,9 +156,17 @@ class ExpenditureDetailPage extends Component {
 
     handleDelete = async () => {
 
-        await eos.transaction("wallet", wallet => {
-            wallet.rmexpense(this.state.departmentId, this.state.expenditureId, { authorization: this.state.accountName + "@active" })
-        });
+        try {
+            await eos.transaction("wallet", wallet => {
+                wallet.rmexpense(this.state.departmentId, this.state.expenditureId, { authorization: this.state.accountName + "@active" })
+            });
+        }
+        catch (ex) {
+            this.setState({
+                errorVisible: true,
+                errorMsg: ex.toString()
+            });
+        }
 
         this.setState({ deleteVisible: false });
 
@@ -285,6 +311,15 @@ class ExpenditureDetailPage extends Component {
                     onCancel={() => { this.setState({ deleteVisible: false }) }}
                 >
                     <p>Are you sure you want to delete the expenditure?</p>
+                </Modal>
+                <Modal
+                    title="Operation Failed"
+                    visible={this.state.errorVisible}
+                    okText="OK"
+                    onOk={() => { this.setState({ errorVisible: false }) }}
+                    onCancel={() => { this.setState({ errorVisible: false }) }}
+                >
+                    <p>{this.state.errorMsg}</p>
                 </Modal>
             </div>
 

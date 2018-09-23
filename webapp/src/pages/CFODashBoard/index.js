@@ -17,12 +17,15 @@ class CFODashboard extends Component {
             newDepartmentModalVisibility: false,
             walletBalance: "- XXX",
             sysLmt: "-",
+            sysUsed: "-",
             tokenName: "XXX",
             tokenPrecision: 0,
             tokenContract: "",
             newAllowance: "",
             departments: [],
-            applications: []
+            applications: [],
+            errorVisible: false,
+            errorMsg: ""
         };
 
         if (!sessionStorage.getItem("privateKey")) {
@@ -87,6 +90,7 @@ class CFODashboard extends Component {
             departments: displayedDepartments,
             applications: displayedApplications,
             sysLmt: this.scaleAmount(configs.system_monthly_limit, token.precision),
+            sysUsed: this.scaleAmount(configs.system_limit_used, token.precision),
             tokenName: token.name,
             tokenPrecision: token.precision,
             tokenContract: configs.token.contract
@@ -117,33 +121,65 @@ class CFODashboard extends Component {
     }
 
     handleApprove = async (id) => {
-        await eos.transaction("wallet", wallet => {
-            wallet.processapp(id, 1, { authorization: "executor@processapp" });
-        });
+        try {
+            await eos.transaction("wallet", wallet => {
+                wallet.processapp(id, 1, { authorization: "executor@processapp" });
+            });
+        }
+        catch (ex) {
+            this.setState({
+                errorVisible: true,
+                errorMsg: ex.toString()
+            });
+        }
 
         this.pageInit();
     }
 
     handleRejct = async (id) => {
-        await eos.transaction("wallet", wallet => {
-            wallet.processapp(id, 0, { authorization: "executor@processapp" });
-        });
+        try {
+            await eos.transaction("wallet", wallet => {
+                wallet.processapp(id, 0, { authorization: "executor@processapp" });
+            });
+        }
+        catch (ex) {
+            this.setState({
+                errorVisible: true,
+                errorMsg: ex.toString()
+            });
+        }
 
         this.pageInit();
     }
 
     handleSuspend = async (id) => {
-        await eos.transaction("wallet", wallet => {
-            wallet.toggledept(id, 0, { authorization: "executor@tgldept" });
-        });
+        try {
+            await eos.transaction("wallet", wallet => {
+                wallet.toggledept(id, 0, { authorization: "executor@tgldept" });
+            });
+        }
+        catch (ex) {
+            this.setState({
+                errorVisible: true,
+                errorMsg: ex.toString()
+            });
+        }
 
         this.pageInit();
     }
 
     handleResume = async (id) => {
-        await eos.transaction("wallet", wallet => {
-            wallet.toggledept(id, 1, { authorization: "executor@tgldept" });
-        });
+        try {
+            await eos.transaction("wallet", wallet => {
+                wallet.toggledept(id, 1, { authorization: "executor@tgldept" });
+            });
+        }
+        catch (ex) {
+            this.setState({
+                errorVisible: true,
+                errorMsg: ex.toString()
+            });
+        }
 
         this.pageInit();
     }
@@ -165,9 +201,17 @@ class CFODashboard extends Component {
 
         const newAmount = Math.round(Number.parseFloat(this.state.newAllowance) * Math.pow(10, this.state.tokenPrecision));
 
-        await eos.transaction("wallet", wallet => {
-            wallet.setdeptlmt(1, newAmount, { authorization: "executor@" + this.state.deptPerm });
-        });
+        try {
+            await eos.transaction("wallet", wallet => {
+                wallet.setdeptlmt(1, newAmount, { authorization: "executor@" + this.state.deptPerm });
+            });
+        }
+        catch (ex) {
+            this.setState({
+                errorVisible: true,
+                errorMsg: ex.toString()
+            });
+        }
 
         this.setState({
             newDepartmentModalVisibility: false,
@@ -201,6 +245,14 @@ class CFODashboard extends Component {
                         </Col>
                         <Col span={12}>
                             <p style={{ textAlign: "center" }}><strong>{this.state.sysLmt} {this.state.tokenName}</strong></p>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <p style={{ textAlign: "center" }}>Expense This Month:</p>
+                        </Col>
+                        <Col span={12}>
+                            <p style={{ textAlign: "center" }}><strong>{this.state.sysUsed} {this.state.tokenName}</strong></p>
                         </Col>
                     </Row>
                 </Card>
@@ -283,6 +335,15 @@ class CFODashboard extends Component {
                             <p style={{ margin: 0 }}>{this.state.tokenName}</p>
                         </Col>
                     </Row>
+                </Modal>
+                <Modal
+                    title="Operation Failed"
+                    visible={this.state.errorVisible}
+                    okText="OK"
+                    onOk={() => { this.setState({ errorVisible: false }) }}
+                    onCancel={() => { this.setState({ errorVisible: false }) }}
+                >
+                    <p>{this.state.errorMsg}</p>
                 </Modal>
             </div>
         );
