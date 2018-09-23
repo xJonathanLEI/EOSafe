@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withRouter } from "react-router-dom";
 import { Card, Col, Row, Divider, Modal, Input } from 'antd';
 import Eos from "eosjs";
 
@@ -263,4 +264,4 @@ class Dashborad extends Component {
     }
 }
 
-export default Dashborad;
+export default withRouter(Dashborad);
