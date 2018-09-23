@@ -8,9 +8,7 @@ class Dashborad extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            changeAllowanceModal: false,
-            key: 'tab1',
-            noTitleKey: 'app',
+            changeAllowanceModal: false
         };
     }
 
@@ -42,8 +40,6 @@ class Dashborad extends Component {
                     style={{ width: '100%' }}
                     title="Allowance"
                     extra={<a href="#" onClick={this.showModal}>Apply to Change</a>}
-                    activeTabKey={this.state.key}
-                    onTabChange={(key) => { this.onTabChange(key, 'key'); }}
                 >
                     <Row gutter={16}>
                         <Col span={12}>
