@@ -62,6 +62,7 @@ class CFODashboard extends Component {
             const currentDepartment = departments[i];
             departmentNames[currentDepartment.id] = currentDepartment.name;
             displayedDepartments.push({
+                key: currentDepartment.id,
                 id: currentDepartment.id,
                 name: currentDepartment.name,
                 enabled: currentDepartment.enabled,
