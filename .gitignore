@@ -21,3 +21,17 @@ bootstrapping/node_modules
 # Some VS Code configs
 
 .vscode/settings.json
+
+# Webapp files
+
+/webapp/node_modules
+/webapp/coverage
+/webapp/build
+/webapp/.DS_Store
+/webapp/.env.local
+/webapp/.env.development.local
+/webapp/.env.test.local
+/webapp/.env.production.local
+/webapp/npm-debug.log*
+/webapp/yarn-debug.log*
+/webapp/yarn-error.log*
