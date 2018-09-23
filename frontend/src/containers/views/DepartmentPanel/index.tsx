@@ -3,7 +3,6 @@ import {observer} from 'mobx-react'
 import {action, observable} from 'mobx'
 
 import * as styles from './index.scss'
-import Header from './Header'
 import ExpenditureComponent from "@views/DepartmentPanel/ExpenditureComponent";
 import RGL, {WidthProvider} from "react-grid-layout";
 import {Card, Form} from "antd";
