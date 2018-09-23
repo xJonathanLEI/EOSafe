@@ -15,21 +15,21 @@ class PageWithModal extends Component {
 
     showModal = () => {
         this.setState({
-            changeAllowanceModal: true,
+            newDepartmentModalVisibility: true,
         });
     }
 
     handleOk = (e) => {
         console.log(e);
         this.setState({
-            changeAllowanceModal: false,
+            newDepartmentModalVisibility: false,
         });
     }
 
     handleCancel = (e) => {
         console.log(e);
         this.setState({
-            changeAllowanceModal: false,
+            newDepartmentModalVisibility: false,
         });
     }
 

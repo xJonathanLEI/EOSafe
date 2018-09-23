@@ -127,7 +127,7 @@ class Dashborad extends Component {
 
     showModal = () => {
         this.setState({
-            changeAllowanceModal: true,
+            newDepartmentModalVisibility: true,
         });
     }
 
@@ -143,13 +143,13 @@ class Dashborad extends Component {
         });
 
         this.setState({
-            changeAllowanceModal: false,
+            newDepartmentModalVisibility: false,
         });
     }
 
     handleCancel = (e) => {
         this.setState({
-            changeAllowanceModal: false,
+            newDepartmentModalVisibility: false,
         });
     }
 

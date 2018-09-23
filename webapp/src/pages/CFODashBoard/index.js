@@ -4,13 +4,15 @@ import { Card, Col, Row, Divider, Modal, Input } from 'antd';
 import Eos from "eosjs";
 import ecc from "eosjs-ecc";
 
-import ExpenditureDisplay from "../../components/ExpenditureDisplay";
+import DepartmentsDisplay from "../../components/DepartmentsDisplay";
+import ApplicationsDisplay from "../../components/ApplicationsDisplay";
 
-const eos = Eos({
-    httpEndpoint: "http://127.0.0.1:8888",
-    chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
-    keyProvider: JSON.parse(sessionStorage.getItem("privateKey"))
-});
+const eos = {}//TODO
+// const eos = Eos({
+//     httpEndpoint: "http://127.0.0.1:8888",
+//     chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
+//     keyProvider: JSON.parse(sessionStorage.getItem("privateKey"))||""
+// });
 
 class CFODashboard extends Component {
 
@@ -19,7 +21,7 @@ class CFODashboard extends Component {
 
         this.state = {
             departmentId: Number.parseInt(sessionStorage.getItem("departmentId")),
-            changeAllowanceModal: false,
+            newDepartmentModalVisibility: false,
             departmentName: "-",
             monthlyAllowance: "-",
             allowanceUsed: "-",
@@ -30,7 +32,10 @@ class CFODashboard extends Component {
             tokenPrecision: 0,
             tokenContract: "",
             newAllowance: "",
-            deptPerm: ""
+            deptPerm: "",
+            walletBalance:"10000.0000 EOS", //TODO
+            departments:[],//TODO
+            applications:[]//TODO
         };
 
         if (!sessionStorage.getItem("privateKey")) {
@@ -126,7 +131,7 @@ class CFODashboard extends Component {
 
     showModal = () => {
         this.setState({
-            changeAllowanceModal: true,
+            newDepartmentModalVisibility: true,
         });
     }
 
@@ -142,25 +147,31 @@ class CFODashboard extends Component {
         });
 
         this.setState({
-            changeAllowanceModal: false,
+            newDepartmentModalVisibility: false,
         });
     }
 
     handleCancel = (e) => {
         this.setState({
-            changeAllowanceModal: false,
+            newDepartmentModalVisibility: false,
         });
     }
 
     render() {
         return (
             <div>
-                <h1>{this.state.departmentName} Department</h1>
+                <h1>{this.state.departmentName} CFO Dashboard</h1>
                 <Card
                     style={{ width: '100%' }}
-                    title="Allowance"
-                    extra={<a href="#" onClick={this.showModal}>Apply to Change</a>}
-                >
+                    title="Overview">
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <p style={{ textAlign: "center" }}>Wallet Balance:</p>
+                        </Col>
+                        <Col span={12}>
+                            <p style={{ textAlign: "center" }}><strong>{this.state.walletBalance} {this.state.tokenName}</strong></p>
+                        </Col>
+                    </Row>
                     <Row gutter={16}>
                         <Col span={12}>
                             <p style={{ textAlign: "center" }}>Monthly Allowance:</p>
@@ -169,62 +180,39 @@ class CFODashboard extends Component {
                             <p style={{ textAlign: "center" }}><strong>{this.state.monthlyAllowance} {this.state.tokenName}</strong></p>
                         </Col>
                     </Row>
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <p style={{ textAlign: "center" }}>Allowance Used:</p>
-                        </Col>
-                        <Col span={12}>
-                            <p style={{ textAlign: "center" }}><strong>{this.state.allowanceUsed} {this.state.tokenName}</strong></p>
-                        </Col>
-                    </Row>
                 </Card>
                 <br />
                 <Row gutter={16}>
                     <Col span={12}>
                         <Card
                             style={{ width: '100%' }}
-                            title="Expenditures"
-                            extra={<a href="#">Manage</a>}
+                            title="Departments"
+                            extra={<a href="#">New Department</a>}//TODO onClick show modal
                             activeTabKey={this.state.key}
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}
                         >
                             {
-                                this.state.expenditures ? <ExpenditureDisplay expenditures={this.state.expenditures} /> : null
+                                this.state.departments ? <DepartmentsDisplay expenditures={this.state.departments} /> : null
                             }
                         </Card>
                     </Col>
                     <Col span={12}>
                         <Card
                             style={{ width: '100%' }}
-                            title="Recent Expenses"
-                            extra={<a href="#">See All</a>}
+                            title="Applications"
                             activeTabKey={this.state.key}
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}
                         >
                             {
-                                this.state.expenses == null ? null :
-                                    this.state.expenses.map((value, index) => <div>
-                                        <Row gutter={16}>
-                                            <Col span={8}>
-                                                <p style={{ margin: 0, color: "grey" }}>2018-08-20 16:00:00</p>
-                                            </Col>
-                                            <Col span={8}>
-                                                <p style={{ margin: 0 }}>{value.memo}</p>
-                                            </Col>
-                                            <Col span={8}>
-                                                <p style={{ margin: 0, fontWeight: "bold", textAlign: "right" }}>- {value.amount} {this.state.tokenName}</p>
-                                            </Col>
-                                        </Row>
-                                        {index == this.state.expenses.length - 1 ? null : <Divider />}
-                                    </div>)
+                                this.state.departments ? <ApplicationsDisplay expenditures={this.state.applications} /> : null
                             }
                         </Card>
                     </Col>
                 </Row>
 
                 <Modal
-                    title="Change Department Allowance"
-                    visible={this.state.changeAllowanceModal}
+                    title="New Department"
+                    visible={this.state.newDepartmentModalVisibility}
                     okText="Submit"
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
