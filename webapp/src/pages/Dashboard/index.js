@@ -4,6 +4,12 @@ import Eos from "eosjs";
 
 import ExpenditureDisplay from "../../components/ExpenditureDisplay";
 
+const eos = Eos({
+    httpEndpoint: "http://127.0.0.1:8888",
+    chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
+    keyProvider: "5Hy6fgqpDaczdH82wMK3BTKf7aktg3vj9qFdem35FL1bBykYro4"
+});
+
 class Dashborad extends Component {
 
     constructor(props) {
@@ -16,16 +22,17 @@ class Dashborad extends Component {
             allowanceAllocated: "-",
             expenditures: null,
             expenses: null,
-            tokenName: "XXX"
+            tokenName: "XXX",
+            tokenPrecision: 0,
+            tokenContract: "",
+            newAllowance: "",
+            deptPerm: ""
         };
 
         this.pageInit();
     }
 
     pageInit = async () => {
-        const eos = Eos({
-            httpEndpoint: "http://127.0.0.1:8888"
-        });
 
         const configs = (await eos.getTableRows(true, "wallet", "wallet", "configs")).rows[0];
         const department = (await eos.getTableRows(true, "wallet", "wallet", "departments")).rows[0];
@@ -71,7 +78,10 @@ class Dashborad extends Component {
             allowanceAllocated: this.scaleAmount(department.allowance_allocated, token.precision),
             expenditures: displayedExpenditures,
             expenses: displayedExpenses,
-            tokenName: token.name
+            tokenName: token.name,
+            tokenPrecision: token.precision,
+            tokenContract: configs.token.contract,
+            deptPerm: department.permission
         });
     }
 
@@ -104,15 +114,23 @@ class Dashborad extends Component {
         });
     }
 
-    handleOk = (e) => {
-        console.log(e);
+    handleOk = async (e) => {
+
+        if (this.state.newAllowance.length == 0 || isNaN(this.state.newAllowance))
+            return;
+
+        const newAmount = Math.round(Number.parseFloat(this.state.newAllowance) * Math.pow(10, this.state.tokenPrecision));
+
+        await eos.transaction("wallet", wallet => {
+            wallet.setdeptlmt(1, newAmount, { authorization: "executor@" + this.state.deptPerm });
+        });
+
         this.setState({
             changeAllowanceModal: false,
         });
     }
 
     handleCancel = (e) => {
-        console.log(e);
         this.setState({
             changeAllowanceModal: false,
         });
@@ -233,7 +251,7 @@ class Dashborad extends Component {
                             <p style={{ margin: 0 }}>New Allowance:</p>
                         </Col>
                         <Col span={10} style={{ textAlign: "right" }}>
-                            <Input placeholder="" />
+                            <Input placeholder="" onChange={(e) => { this.setState({ newAllowance: e.target.value }) }} />
                         </Col>
                         <Col span={4}>
                             <p style={{ margin: 0 }}>{this.state.tokenName}</p>
