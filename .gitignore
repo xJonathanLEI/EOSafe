@@ -1,19 +1,6 @@
-# Front-end files
-
-/frontend/node_modules
-/frontend/npm-debug*
-/frontend/dist
-/frontend/index.html
-/frontend/.cache-loader
-/frontend/.awcache
-/frontend/deploy
-/frontend/.idea/
-/frontend/.vscode
-/frontend/.cache-loader
-
 # Contract files
 
-contracts/build/
+# contracts/build/
 
 # Bootstrapping files
 bootstrapping/node_modules
