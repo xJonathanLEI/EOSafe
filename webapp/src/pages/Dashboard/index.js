@@ -30,14 +30,15 @@ class Dashborad extends Component {
             tokenPrecision: 0,
             tokenContract: "",
             newAllowance: "",
-            deptPerm: ""
+            deptPerm: "",
+            accountName: sessionStorage.getItem("acctName")
         };
 
         if (!sessionStorage.getItem("privateKey")) {
             this.props.history.push("/");
             return;
         }
-
+        
         this.pageInit();
     }
 
@@ -127,7 +128,7 @@ class Dashborad extends Component {
 
     showModal = () => {
         this.setState({
-            newDepartmentModalVisibility: true,
+            changeAllowanceModal: true,
         });
     }
 
@@ -139,17 +140,17 @@ class Dashborad extends Component {
         const newAmount = Math.round(Number.parseFloat(this.state.newAllowance) * Math.pow(10, this.state.tokenPrecision));
 
         await eos.transaction("wallet", wallet => {
-            wallet.setdeptlmt(1, newAmount, { authorization: "executor@" + this.state.deptPerm });
+            wallet.setdeptlmt(1, newAmount, { authorization: this.state.accountName + "@active" });
         });
 
         this.setState({
-            newDepartmentModalVisibility: false,
+            changeAllowanceModal: false,
         });
     }
 
     handleCancel = (e) => {
         this.setState({
-            newDepartmentModalVisibility: false,
+            changeAllowanceModal: false,
         });
     }
 

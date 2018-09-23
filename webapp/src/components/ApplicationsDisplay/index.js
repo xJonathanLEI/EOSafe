@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Row, Progress, Divider } from 'antd';
+import { Col, Row, Progress, Divider, Button } from 'antd';
 
 class ApplicationsDisplay extends Component {
 
@@ -11,15 +11,18 @@ class ApplicationsDisplay extends Component {
                         (<div>
                             <Row gutter={16}>
                                 <Col span={10}>
-                                    <p><strong>{value.name}</strong></p>
+                                    <p><strong>{value.departmentName} Department</strong></p>
                                 </Col>
                                 <Col span={14} style={{ textAlign: "right" }}>
-                                    <p>{value.used} / {value.total}</p>
+                                    <Button type="primary">Approve</Button> <Button type="dashed">Reject</Button>
                                 </Col>
                             </Row>
-                            <Row gutter={16}>
-                                <Col span={24}>
-                                    <Progress percent={value.percent} />
+                            <Row gutter={16} style={{ paddingTop: 8 }}>
+                                <Col span={10}>
+                                    <p>Allowance Change:</p>
+                                </Col>
+                                <Col span={14}>
+                                    <p style={{ textAlign: "right" }}>From <strong>{value.from}</strong> to <strong>{value.to}</strong></p>
                                 </Col>
                             </Row>
                             {index == this.props.applications.length - 1 ?

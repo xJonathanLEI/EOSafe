@@ -2,17 +2,15 @@ import React, { Component } from 'react';
 import { withRouter } from "react-router-dom";
 import { Card, Col, Row, Divider, Modal, Input } from 'antd';
 import Eos from "eosjs";
-import ecc from "eosjs-ecc";
 
 import DepartmentsDisplay from "../../components/DepartmentsDisplay";
 import ApplicationsDisplay from "../../components/ApplicationsDisplay";
 
-const eos = {}//TODO
-// const eos = Eos({
-//     httpEndpoint: "http://127.0.0.1:8888",
-//     chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
-//     keyProvider: JSON.parse(sessionStorage.getItem("privateKey"))||""
-// });
+const eos = Eos({
+    httpEndpoint: "http://127.0.0.1:8888",
+    chainId: "cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f",
+    keyProvider: JSON.parse(sessionStorage.getItem("privateKey"))
+});
 
 class CFODashboard extends Component {
 
@@ -20,22 +18,15 @@ class CFODashboard extends Component {
         super(props);
 
         this.state = {
-            departmentId: Number.parseInt(sessionStorage.getItem("departmentId")),
             newDepartmentModalVisibility: false,
-            departmentName: "-",
-            monthlyAllowance: "-",
-            allowanceUsed: "-",
-            allowanceAllocated: "-",
-            expenditures: null,
-            expenses: null,
+            walletBalance: "- XXX",
+            sysLmt: "-",
             tokenName: "XXX",
             tokenPrecision: 0,
             tokenContract: "",
             newAllowance: "",
-            deptPerm: "",
-            walletBalance:"10000.0000 EOS", //TODO
-            departments:[],//TODO
-            applications:[]//TODO
+            departments: [],
+            applications: []
         };
 
         if (!sessionStorage.getItem("privateKey")) {
@@ -49,60 +40,48 @@ class CFODashboard extends Component {
     pageInit = async () => {
 
         const configs = (await eos.getTableRows(true, "wallet", "wallet", "configs")).rows[0];
-        const departments = (await eos.getTableRows(true, "wallet", "wallet", "departments")).rows;
-        let department;
-        for (let i = 0; i < departments.length; i++) {
-            if (departments[i].id == this.state.departmentId) {
-                department = departments[i];
-                break;
-            }
-        }
-        const expenditures = (await eos.getTableRows(true, "wallet", department.id, "expenditures")).rows;
-        const expenses = (await eos.getTableRows(true, "wallet", "wallet", "expenses")).rows;
-
         const token = this.parseToken(configs.token);
+        const balance = await eos.getCurrencyBalance(configs.token.contract, "wallet", token.name);
+        const departmentNames = new Object();
 
-        const displayedExpenditures = new Array();
-        const displayedExpenses = new Array();
-
-        for (let i = 0; i < expenditures.length; i++) {
-
-            const currentExpenditure = expenditures[i];
-            if (currentExpenditure.removed)
-                continue;
-
-            displayedExpenditures.push({
-                name: currentExpenditure.name,
-                used: this.formatAmount(currentExpenditure.allowance_used, token),
-                total: this.formatAmount(currentExpenditure.monthly_allowance, token),
-                percent: Math.round(currentExpenditure.allowance_used / currentExpenditure.monthly_allowance * 100)
+        const displayedDepartments = new Array();
+        const departments = (await eos.getTableRows(true, "wallet", "wallet", "departments")).rows;
+        for (let i = 0; i < departments.length; i++) {
+            const currentDepartment = departments[i];
+            departmentNames[currentDepartment.id] = currentDepartment.name;
+            displayedDepartments.push({
+                name: currentDepartment.name,
+                enabled: currentDepartment.enabled,
+                total: this.scaleAmount(currentDepartment.monthly_allowance, token.precision),
+                used: this.scaleAmount(currentDepartment.allowance_used, token.precision),
+                percent: Math.round(currentDepartment.allowance_used / currentDepartment.monthly_allowance * 100)
             });
         }
 
-        for (let i = expenses.length - 1; i >= 0; i--) {
-
-            const currentExpense = expenses[i];
-            if (currentExpense.department_id != department.id)
+        const applications = (await eos.getTableRows(true, "wallet", "wallet", "applications")).rows;
+        const displayedApplications = new Array();
+        for (let i = 0; i < applications.length; i++) {
+            const currentApplication = applications[i];
+            if (currentApplication.status != 1)
                 continue;
 
-            displayedExpenses.push({
-                time: currentExpense.time,
-                amount: this.scaleAmount(currentExpense.amount, token.precision),
-                memo: currentExpense.memo
-            });
+            displayedApplications.push({
+                id: currentApplication.id,
+                departmentId: currentApplication.department_id,
+                from: this.formatAmount(currentApplication.from_allowance, token),
+                to: this.formatAmount(currentApplication.to_allowance, token),
+                departmentName: departmentNames[currentApplication.department_id]
+            })
         }
 
         this.setState({
-            departmentName: department.name,
-            monthlyAllowance: this.scaleAmount(department.monthly_allowance, token.precision),
-            allowanceUsed: this.scaleAmount(department.allowance_used, token.precision),
-            allowanceAllocated: this.scaleAmount(department.allowance_allocated, token.precision),
-            expenditures: displayedExpenditures,
-            expenses: displayedExpenses,
+            walletBalance: balance[0],
+            departments: displayedDepartments,
+            applications: displayedApplications,
+            sysLmt: this.scaleAmount(configs.system_monthly_limit, token.precision),
             tokenName: token.name,
             tokenPrecision: token.precision,
-            tokenContract: configs.token.contract,
-            deptPerm: department.permission
+            tokenContract: configs.token.contract
         });
     }
 
@@ -169,15 +148,15 @@ class CFODashboard extends Component {
                             <p style={{ textAlign: "center" }}>Wallet Balance:</p>
                         </Col>
                         <Col span={12}>
-                            <p style={{ textAlign: "center" }}><strong>{this.state.walletBalance} {this.state.tokenName}</strong></p>
+                            <p style={{ textAlign: "center" }}><strong>{this.state.walletBalance}</strong></p>
                         </Col>
                     </Row>
                     <Row gutter={16}>
                         <Col span={12}>
-                            <p style={{ textAlign: "center" }}>Monthly Allowance:</p>
+                            <p style={{ textAlign: "center" }}>System Level Monthly Limit:</p>
                         </Col>
                         <Col span={12}>
-                            <p style={{ textAlign: "center" }}><strong>{this.state.monthlyAllowance} {this.state.tokenName}</strong></p>
+                            <p style={{ textAlign: "center" }}><strong>{this.state.sysLmt} {this.state.tokenName}</strong></p>
                         </Col>
                     </Row>
                 </Card>
@@ -187,12 +166,11 @@ class CFODashboard extends Component {
                         <Card
                             style={{ width: '100%' }}
                             title="Departments"
-                            extra={<a href="#">New Department</a>}//TODO onClick show modal
+                            extra={<a>New Department</a>}//TODO onClick show modal
                             activeTabKey={this.state.key}
-                            onTabChange={(key) => { this.onTabChange(key, 'key'); }}
-                        >
+                            onTabChange={(key) => { this.onTabChange(key, 'key'); }}>
                             {
-                                this.state.departments ? <DepartmentsDisplay expenditures={this.state.departments} /> : null
+                                this.state.departments ? <DepartmentsDisplay departments={this.state.departments} /> : null
                             }
                         </Card>
                     </Col>
@@ -204,7 +182,7 @@ class CFODashboard extends Component {
                             onTabChange={(key) => { this.onTabChange(key, 'key'); }}
                         >
                             {
-                                this.state.departments ? <ApplicationsDisplay expenditures={this.state.applications} /> : null
+                                this.state.applications ? <ApplicationsDisplay applications={this.state.applications} /> : null
                             }
                         </Card>
                     </Col>

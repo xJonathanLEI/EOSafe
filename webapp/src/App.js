@@ -44,9 +44,6 @@ class App extends Component {
                                 <Menu.Item key="1" onClick={() => {
                                     this.props.history.push("/manager")
                                 }}>Dashboard</Menu.Item>
-                                <Menu.Item key="2" onClick={() => {
-                                    this.props.history.push("/cfo")
-                                }}>CFO Dashboard</Menu.Item>
                             </Menu>
                         </Header>
                         <Content style={{padding: '0 50px'}}>
