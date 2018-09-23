@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Divider, Row, Col, Button } from 'antd';
+import { Card, Divider, Row, Col, Button, Modal, Input } from 'antd';
 import Eos from "eosjs";
 
 let eos;
@@ -16,8 +16,13 @@ class ExpenditureDetailPage extends Component {
             expenditureRecipient: "-",
             expenditureAllowance: "-",
             expenditureUsed: "-",
+            expenditureAllowanceLeft: "-",
             tokenName: "XXX",
-            expenses: null
+            expenses: null,
+            spendVisible: false,
+            spendAmount: "",
+            memo: "",
+            accountName: sessionStorage.getItem("acctName")
         };
 
         const keys = JSON.parse(sessionStorage.getItem("privateKey"));
@@ -68,6 +73,7 @@ class ExpenditureDetailPage extends Component {
             expenditureRecipient: expenditure.recipient,
             expenditureAllowance: this.scaleAmount(expenditure.monthly_allowance, token.precision),
             expenditureUsed: this.scaleAmount(expenditure.allowance_used, token.precision),
+            expenditureAllowanceLeft: this.scaleAmount(expenditure.monthly_allowance - expenditure.allowance_used, token.precision),
             tokenName: token.name,
             tokenPrecision: token.precision,
             expenses: displayedExpenses
@@ -97,11 +103,26 @@ class ExpenditureDetailPage extends Component {
         return { name: symbolName, precision: tokenPrecision };
     }
 
+    handleSpend = async () => {
+        if (this.state.spendAmount.length == 0 || isNaN(this.state.spendAmount))
+            return;
+
+        const spendAmount = Math.round(Number.parseFloat(this.state.spendAmount) * Math.pow(10, this.state.tokenPrecision));
+
+        await eos.transaction("wallet", wallet => {
+            wallet.spend(this.state.departmentId, this.state.expenditureId, spendAmount, this.state.memo, { authorization: this.state.accountName + "@active" })
+        });
+
+        this.setState({ spendVisible: false });
+
+        this.initPage();
+    }
+
     render() {
         return (
             <div>
                 <h1>{this.state.expenditureName} Expenditure</h1>
-                <Card title="Overview" extra={<div><Button type="primary">Spend</Button>  <Button type="default">Change Limit</Button>  <Button type="danger">Delete</Button></div>}>
+                <Card title="Overview" extra={<div><Button type="primary" onClick={() => { this.setState({ spendVisible: true }); }}>Spend</Button>  <Button type="default">Change Limit</Button>  <Button type="danger">Delete</Button></div>}>
                     <Row gutter={16}>
                         <Col span={12}>
                             <p style={{ textAlign: "center" }}>Recipient:</p>
@@ -148,6 +169,55 @@ class ExpenditureDetailPage extends Component {
                             </div>)
                     }
                 </Card>
+                <Modal
+                    title="Spend Tokens"
+                    visible={this.state.spendVisible}
+                    okText="Submit"
+                    onOk={this.handleSpend}
+                    onCancel={() => { this.setState({ spendVisible: false }) }}
+                >
+                    <Row gutter={16}>
+                        <Col span={10} style={{ textAlign: "center" }}>
+                            <p>Monthly Allowance:</p>
+                        </Col>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <p>{this.state.expenditureAllowance}</p>
+                        </Col>
+                        <Col span={4}>
+                            <p>{this.state.tokenName}</p>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={10} style={{ textAlign: "center" }}>
+                            <p>Allowance Left:</p>
+                        </Col>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <p>{this.state.expenditureAllowanceLeft}</p>
+                        </Col>
+                        <Col span={4}>
+                            <p>{this.state.tokenName}</p>
+                        </Col>
+                    </Row>
+                    <Row gutter={16} style={{ display: "flex", alignItems: "center" }}>
+                        <Col span={10} style={{ textAlign: "center" }}>
+                            <p style={{ margin: 0 }}>Amount:</p>
+                        </Col>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <Input placeholder="" onChange={(e) => { this.setState({ spendAmount: e.target.value }) }} />
+                        </Col>
+                        <Col span={4}>
+                            <p style={{ margin: 0 }}>{this.state.tokenName}</p>
+                        </Col>
+                    </Row>
+                    <Row gutter={16} style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
+                        <Col span={10} style={{ textAlign: "center" }}>
+                            <p style={{ margin: 0 }}>Memo:</p>
+                        </Col>
+                        <Col span={10} style={{ textAlign: "right" }}>
+                            <Input placeholder="" onChange={(e) => { this.setState({ memo: e.target.value }) }} />
+                        </Col>
+                    </Row>
+                </Modal>
             </div>
 
         )
